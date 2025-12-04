@@ -11,8 +11,8 @@
 
 | Project Name | Description | Key Tech Stack |
 | :--- | :--- | :--- |
-| **[1] RLHF-RAG-BASED-QA** | **Llama-3.2 기반 RLHF 파이프라인 구축**<br>• `SFT` → `RM` → `PPO` → `Merge` 전 과정 구현<br>• Human Feedback을 반영한 QA 모델 정렬(Alignment)<br>• LoRA 및 4-bit Quantization을 통한 효율적 학습 |   <br> `Transformers` `TRL` `PEFT` |
-| **[2] Speaker Sentiment Analysis** | **KoBERT & FT-Transformer 기반 멀티모달 심리 분석**<br>• 대화 텍스트(Text)와 인구통계 정보(Tabular) 결합<br>• **Cross-Attention**을 활용한 Late Fusion 아키텍처<br>• 발화자의 불안/우울 지수 예측 멀티태스크 학습 |   <br> `FT-Transformer` `Pandas` `Scikit-learn` |
+| **[1] QA봇** | **Llama-3.2 기반 RLHF 파이프라인 구축**<br>• `SFT` → `RM` → `PPO` → `Merge` 전 과정 구현<br>• Human Feedback을 반영한 QA 모델 정렬(Alignment)<br>• LoRA 및 4-bit Quantization을 통한 효율적 학습 |   <br> `Transformers` `TRL` `PEFT` |
+| **[2] 발화자 감정 판별** | **KoBERT & FT-Transformer 기반 멀티모달 심리 분석**<br>• 대화 텍스트(Text)와 인구통계 정보(Tabular) 결합<br>• **Cross-Attention**을 활용한 Late Fusion 아키텍처<br>• 발화자의 불안/우울 지수 예측 멀티태스크 학습 |   <br> `FT-Transformer` `Pandas` `Scikit-learn` |
 
 <br>
 
