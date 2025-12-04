@@ -22,6 +22,7 @@
 ### 1\. QA봇
 
   * **주요 목표:** Pre-trained LLM(Llama-3.2-1B)이 사용자의 의도에 부합하는 자연스러운 답변을 생성하도록 강화학습(RLHF) 적용.
+  * **데이터:** [RLHF 학습 데이터](https://www.aihub.or.kr/aihubdata/data/view.do?currMenu=115&topMenu=100&aihubDataSe=data&dataSetSn=71748)
   * **핵심 기능:**
       * **SFT (Supervised Fine-Tuning):** 질의응답 데이터셋을 통한 기본 답변 능력 학습.
       * **Reward Model:** 인간의 선호도를 모방하여 답변 품질을 평가하는 보상 모델 학습.
@@ -30,6 +31,7 @@
 ### 2\. 발화자 감정 판별
 
   * **주요 목표:** 단순 텍스트 분석의 한계를 넘어, 발화자의 배경 정보(나이, 성별, 가구 형태 등)를 함께 고려하여 정밀한 심리 상태(불안/우울) 진단.
+  * **데이터:** [고령자 근현대 경험 기반 스토리 구술 데이터](https://www.aihub.or.kr/aihubdata/data/view.do?pageIndex=2&currMenu=115&topMenu=100&srchOptnCnd=OPTNCND001&searchKeyword=&srchDetailCnd=DETAILCND001&srchOrder=ORDER001&srchPagePer=20&srchDataRealmCode=REALM002&aihubDataSe=data&dataSetSn=71703)
   * **핵심 기능:**
       * **Multimodal Fusion:** 텍스트 임베딩(KoBERT)과 정형 데이터 임베딩(FT-Transformer)을 Attention 메커니즘으로 융합.
       * **Multi-task Learning:** 4가지 심리 척도(Anxiety 1/2, Depression 1/2)를 동시에 예측하여 일반화 성능 향상.
@@ -37,7 +39,7 @@
 ### 3\. 예술의 전당 예매 데이터 분석
 
   * **주요 목표:** 예술의 전당 예매 데이터를 분석하여 적자 개선 및 흑자 전환을 위한 효율적인 마케팅/프로모션 전략 수립[cite: 1].
-  * **데이터:** 문화 빅데이터 플랫폼의 2015\~2023년 티켓 판매 데이터 및 공연장 좌석 정보[cite: 1].
+  * **데이터:** [문화 빅데이터 플랫폼의 2015\~2023년 티켓 판매 데이터 및 공연장 좌석 정보](https://www.bigdata-culture.kr/bigdata/user/data_market/detail.do?id=1bc78801-5d36-4295-b49e-fe2a47e062e)
   * **핵심 과정:**
       * **Data Preprocessing:** 결측치 처리, 파생변수 생성(ID, 날짜 병합), 범주형 데이터 변환(나이대, 환불여부 등)을 통한 분석용 데이터셋 구축[cite: 1].
       * **EDA & Strategy:** 유료 회원 등급, 공연 요일/시간, 장르별 선호도, 연령대가 매출에 미치는 영향 분석[cite: 1].
