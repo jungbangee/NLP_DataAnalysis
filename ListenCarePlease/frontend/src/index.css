@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Light Mode Colors */
+  --color-bg-primary: 249 248 246;      /* #F9F8F6 - 메인 배경 */
+  --color-bg-secondary: 239 233 227;    /* #EFE9E3 - 보조 배경 */
+  --color-bg-tertiary: 217 207 199;     /* #D9CFC7 - 카드/박스 배경 */
+  --color-bg-accent: 201 181 156;       /* #C9B59C - 액센트/호버 */
+
+  /* Accent Colors */
+  --color-accent-blue: 74 144 226;      /* #4A90E2 */
+  --color-accent-green: 122 201 67;     /* #7AC943 */
+  --color-accent-orange: 245 166 35;    /* #F5A623 */
+  --color-accent-red: 233 75 60;        /* #E94B3C */
+}
+
+html.dark,
+.dark {
+  /* Dark Mode Colors */
+  --color-bg-primary: 55 53 62;         /* #37353E - 메인 배경 */
+  --color-bg-secondary: 45 43 52;       /* #2D2B34 - 보조 배경 */
+  --color-bg-tertiary: 65 63 72;        /* #413F48 - 카드/박스 */
+  --color-bg-accent: 75 73 82;          /* #4B4952 - 액센트/호버 */
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
