@@ -3,7 +3,7 @@
 # 📂 NLP & Data Analysis
 
 > **Natural Language Processing (NLP)** 및 **Multimodal Data Analysis** 연구/개발 프로젝트 아카이브입니다.
-> LLM 파인튜닝, 멀티모달 딥러닝 모델링, 그리고 비즈니스 인사이트 도출을 위한 데이터 시각화 프로젝트를 포함합니다.
+> LLM 파인튜닝, AI 에이전트 개발, 멀티모달 딥러닝, 그리고 데이터 시각화 프로젝트를 포함합니다.
 
 <br>
 
@@ -11,15 +11,26 @@
 
 | Project Name | Description | Key Tech Stack |
 | :--- | :--- | :--- |
-| **[1] QA봇** | **Llama-3.2 기반 RLHF 파이프라인 구축**<br>• `SFT` → `RM` → `PPO` → `Merge` 전 과정 구현<br>• Human Feedback을 반영한 QA 모델 정렬(Alignment)<br>• LoRA 및 4-bit Quantization을 통한 효율적 학습 |   <br> `Transformers` `TRL` `PEFT` |
-| **[2] 발화자 감정 판별** | **KoBERT & FT-Transformer 기반 멀티모달 심리 분석**<br>• 대화 텍스트(Text)와 인구통계 정보(Tabular) 결합<br>• **Cross-Attention**을 활용한 Late Fusion 아키텍처<br>• 발화자의 불안/우울 지수 예측 멀티태스크 학습 |   <br> `FT-Transformer` `Pandas` `Scikit-learn` |
-| **[3] 예술의 전당 예매 데이터 분석** | **예술의 전당 예매 데이터 기반 매출 증대 전략 분석**<br>• 2015\~2023년 티켓 판매 빅데이터 전처리 및 EDA<br>• 고객 세분화(Member, Age) 및 시기별 매출 패턴 분석<br>• **Tableau** 대시보드를 활용한 마케팅 인사이트 도출 |   <br> `Pandas` `Data Visualization` |
+| **[1] ListenCarePlease** | **AI 기반 회의록 자동 생성 및 화자 태깅 서비스**<br>• Whisper(STT)와 LangGraph Agent를 활용한 화자 분리 및 태깅<br>• 회의 유형별(6종) 맞춤형 회의록 생성 및 TODO 자동 추출<br>• RAG 기반 질의응답 및 발화 효율성 분석 대시보드 제공 |   <br> `Whisper` `LangGraph` `React` |
+| **[2] QA봇** | **Llama-3.2 기반 RLHF 파이프라인 구축**<br>• `SFT` → `RM` → `PPO` → `Merge` 전 과정 구현<br>• Human Feedback을 반영한 QA 모델 정렬(Alignment)<br>• LoRA 및 4-bit Quantization을 통한 효율적 학습 |   <br> `Transformers` `TRL` `PEFT` |
+| **[3] 발화자 감정 판별** | **KoBERT & FT-Transformer 기반 멀티모달 심리 분석**<br>• 대화 텍스트(Text)와 인구통계 정보(Tabular) 결합<br>• **Cross-Attention**을 활용한 Late Fusion 아키텍처 구현<br>• 발화자의 불안/우울 지수 예측 멀티태스크 학습 |   <br> `FT-Transformer` `Multimodal` |
+| **[4] 예술의 전당 예매 데이터 분석** | **예술의 전당 예매 데이터 기반 매출 증대 전략 분석**<br>• 2015\~2023년 티켓 판매 빅데이터 전처리 및 EDA<br>• 고객 세분화(Member, Age) 및 시기별 매출 패턴 분석<br>• **Tableau** 대시보드를 활용한 마케팅 인사이트 도출 |   <br> `Data Visualization` |
 
 <br>
 
 ## 🛠️ Detail Overview
 
-### 1\. QA봇
+### 1\. ListenCarePlease
+
+  * **Project Link:** [ListenCarePlease Repository](https://www.google.com/search?q=https://github.com/jungbangee/NLP_DataAnalysis/tree/main/ListenCarePlease)
+  * **주요 목표:** 회의, 인터뷰 등 음성 파일을 분석하여 **화자 분리(Diarization)**, **화자 태깅(Tagging)**, \*\*회의록 요약(Summary)\*\*을 자동화하는 AI 서비스 개발.
+  * **핵심 기능:**
+      * **Advanced Speaker Tagging:** LangGraph Agent를 활용한 5단계 파이프라인(음성/텍스트 임베딩 매칭 + LLM 추론)으로 정확한 화자 식별.
+      * **Smart Meeting Minutes:** 6가지 회의 유형(정보 전달, 문제 해결 등)을 자동 감지하여 구조화된 회의록 및 키워드 생성.
+      * **AI Assistant Tools:** RAG(Retrieval-Augmented Generation) 기반 회의 내용 질의응답 및 실행 가능한 TODO/일정 자동 추출.
+      * **Efficiency Dashboard:** 발화 빈도, 침묵 시간, 화자 간 상호작용 네트워크(Interaction Network) 등 회의 효율성 지표 시각화.
+
+### 2\. QA봇
 
   * **주요 목표:** Pre-trained LLM(Llama-3.2-1B)이 사용자의 의도에 부합하는 자연스러운 답변을 생성하도록 강화학습(RLHF) 적용.
   * **데이터:** [RLHF 학습 데이터](https://www.aihub.or.kr/aihubdata/data/view.do?currMenu=115&topMenu=100&aihubDataSe=data&dataSetSn=71748)
@@ -28,15 +39,16 @@
       * **Reward Model:** 인간의 선호도를 모방하여 답변 품질을 평가하는 보상 모델 학습.
       * **PPO (Proximal Policy Optimization):** 보상 점수를 최대화하는 방향으로 생성 모델 정책 최적화.
 
-### 2\. 발화자 감정 판별
+### 3\. 발화자 감정 판별
 
-  * **주요 목표:** 단순 텍스트 분석의 한계를 넘어, 발화자의 배경 정보(나이, 성별, 가구 형태 등)를 함께 고려하여 정밀한 심리 상태(불안/우울) 진단.
-  * **데이터:** [고령자 근현대 경험 기반 스토리 구술 데이터](https://www.aihub.or.kr/aihubdata/data/view.do?pageIndex=2&currMenu=115&topMenu=100&srchOptnCnd=OPTNCND001&searchKeyword=&srchDetailCnd=DETAILCND001&srchOrder=ORDER001&srchPagePer=20&srchDataRealmCode=REALM002&aihubDataSe=data&dataSetSn=71703)
+  * **주요 목표:** 단순 텍스트 분석의 한계를 넘어, 고령자의 인구통계학적 정보(나이, 가구 형태 등)와 구술 텍스트를 함께 분석하여 정밀한 심리 상태(불안/우울)를 진단하는 AI 모델 연구.
+  * **데이터:** [고령자 근현대 경험 기반 스토리 구술 데이터](https://www.aihub.or.kr/aihubdata/data/view.do?pageIndex=2&currMenu=115&topMenu=100&srchOptnCnd=OPTNCND001&searchKeyword=&srchDetailCnd=DETAILCND001&srchOrder=ORDER001&srchPagePer=20&srchDataRealmCode=REALM002&aihubDataSe=data&dataSetSn=71703) (AI Hub)
   * **핵심 기능:**
       * **Multimodal Fusion:** 텍스트 임베딩(KoBERT)과 정형 데이터 임베딩(FT-Transformer)을 Attention 메커니즘으로 융합.
+      * **Cross-Attention:** 서로 다른 모달리티(Text ↔ Tabular) 간의 상호작용을 학습하여 정보 손실을 최소화한 Late Fusion 아키텍처.
       * **Multi-task Learning:** 4가지 심리 척도(Anxiety 1/2, Depression 1/2)를 동시에 예측하여 일반화 성능 향상.
 
-### 3\. 예술의 전당 예매 데이터 분석
+### 4\. 예술의 전당 예매 데이터 분석
 
   * **주요 목표:** 예술의 전당 예매 데이터를 분석하여 적자 개선 및 흑자 전환을 위한 효율적인 마케팅/프로모션 전략 수립.
   * **데이터:** [문화 빅데이터 플랫폼의 2015\~2023년 티켓 판매 데이터 및 공연장 좌석 정보](https://www.bigdata-culture.kr/bigdata/user/data_market/detail.do?id=1bc78801-5d36-4295-b49e-fe2a47e062e)
