@@ -23,7 +23,7 @@
 ### 1\. ListenCarePlease
 
   * **Project Link:** [ListenCarePlease Repository](https://github.com/jungbangee/ListenCarePlease)
-  * **주요 목표:** 회의, 인터뷰 등 음성 파일을 분석하여 **화자 분리(Diarization)**, **화자 태깅(Tagging)**, \*\*회의록 요약(Summary)\*\*을 자동화하는 AI 서비스 개발.
+  * **주요 목표:** 회의, 인터뷰 등 음성 파일을 분석하여 **화자 분리(Diarization)**, **화자 태깅(Tagging)**, **회의록 요약(Summary))** 을 자동화하는 AI 서비스 개발.
   * **핵심 기능:**
       * **Advanced Speaker Tagging:** LangGraph Agent를 활용한 5단계 파이프라인(음성/텍스트 임베딩 매칭 + LLM 추론)으로 정확한 화자 식별.
       * **Smart Meeting Minutes:** 6가지 회의 유형(정보 전달, 문제 해결 등)을 자동 감지하여 구조화된 회의록 및 키워드 생성.
