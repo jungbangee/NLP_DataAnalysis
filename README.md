@@ -1,129 +1,3 @@
----
-
-# 📂 NLP & Data Analysis
-
-> **Natural Language Processing (NLP)** 및 **Multimodal Data Analysis** 연구/개발 프로젝트 아카이브입니다.
-> LLM 파인튜닝, AI 에이전트 개발, 멀티모달 딥러닝, 그리고 데이터 시각화 프로젝트를 포함합니다.
-
-## 📜 Project List
-
-| Project Name | Description | Key Tech Stack |
-| --- | --- | --- |
-| **[1] ListenCarePlease** | **AI 기반 회의록 자동 생성 및 화자 태깅 서비스**<br>
-
-<br>• Whisper(STT)와 LangGraph Agent를 활용한 화자 분리 및 태깅<br>
-
-<br>• 회의 유형별(6종) 맞춤형 회의록 생성 및 TODO 자동 추출<br>
-
-<br>• RAG 기반 질의응답 및 발화 효율성 분석 대시보드 제공 | `Whisper` `LangGraph` `React` |
-| **[2] QA봇** | **Llama-3.2 기반 RLHF 파이프라인 구축**<br>
-
-<br>• `SFT` → `RM` → `PPO` → `Merge` 전 과정 구현<br>
-
-<br>• Human Feedback을 반영한 QA 모델 정렬(Alignment)<br>
-
-<br>• LoRA 및 4-bit Quantization을 통한 효율적 학습 | `Transformers` `TRL` `PEFT` |
-| **[3] 발화자 감정 판별** | **KoBERT & FT-Transformer 기반 멀티모달 심리 분석**<br>
-
-<br>• 대화 텍스트(Text)와 인구통계 정보(Tabular) 결합<br>
-
-<br>• **Cross-Attention**을 활용한 Late Fusion 아키텍처 구현<br>
-
-<br>• 발화자의 불안/우울 지수 예측 멀티태스크 학습 | `FT-Transformer` `Multimodal` |
-| **[4] 예술의 전당 예매 데이터 분석** | **예술의 전당 예매 데이터 기반 매출 증대 전략 분석**<br>
-
-<br>• 2015~2023년 티켓 판매 빅데이터 전처리 및 EDA<br>
-
-<br>• 고객 세분화(Member, Age) 및 시기별 매출 패턴 분석<br>
-
-<br>• **Tableau** 대시보드를 활용한 마케팅 인사이트 도출 | `Data Visualization` |
-
-## 🛠️ Detail Overview
-
-### 1. ListenCarePlease
-
-* **Project Link:** [ListenCarePlease Repository](https://github.com/jungbangee/ListenCarePlease)
-* **주요 목표:** 회의, 인터뷰 등 음성 파일을 분석하여 화자 분리, 태깅, 요약을 자동화하는 AI 서비스 개발.
-* **핵심 기능:**
-* **Advanced Speaker Tagging:** LangGraph Agent를 활용한 5단계 파이프라인(음성/텍스트 임베딩 매칭 + LLM 추론)으로 정확한 화자 식별.
-* **Smart Meeting Minutes:** 6가지 회의 유형을 자동 감지하여 구조화된 회의록 및 키워드 생성.
-* **AI Assistant Tools:** RAG 기반 회의 내용 질의응답 및 TODO/일정 자동 추출.
-* **Efficiency Dashboard:** 발화 빈도, 침묵 시간, 화자 간 상호작용 네트워크 시각화.
-
-
-* **Technical Decision:**
-* **LangGraph:** 단순 선형 파이프라인이 아닌, 화자 정보 불확실 시 재추론을 수행하거나 회의 유형에 따라 로직을 분기하는 **Cyclic Graph**를 구현하기 위해 채택.
-
-
-* **Troubleshooting:**
-* **Issue:** Whisper 모델의 긴 침묵 구간에서 발생하는 환각(Hallucination) 및 중복 텍스트 생성 문제.
-* **Solution:** `VAD(Voice Activity Detection)`를 전처리 단계에 도입하여 유효 발화 구간을 선별함으로써 데이터 노이즈 제거 및 요약 성능 개선.
-
-
-
-### 2. QA봇
-
-* **주요 목표:** Pre-trained LLM(Llama-3.2-1B)이 사용자의 의도에 부합하는 자연스러운 답변을 생성하도록 강화학습(RLHF) 적용.
-* **핵심 기능:**
-* **SFT (Supervised Fine-Tuning):** 질의응답 데이터셋을 통한 기본 답변 능력 학습.
-* **Reward Model:** 인간의 선호도를 모방하여 답변 품질을 평가하는 보상 모델 학습.
-* **PPO (Proximal Policy Optimization):** 보상 점수를 최대화하는 방향으로 생성 모델 정책 최적화.
-
-
-* **Technical Decision:**
-* **LoRA & PEFT:** 8B급 이상의 모델 전체 튜닝은 리소스 소모가 크므로, 일부 파라미터만 학습하는 **LoRA**를 활용해 학습 효율과 성능의 균형을 맞춤.
-
-
-* **Troubleshooting:**
-* **Issue:** PPO 학습 중 보상 모델의 허점을 이용해 특정 패턴의 문구만 반복하여 보상 점수를 높게 받는 **Reward Hacking** 발생.
-* **Solution:** `KL-Divergence Penalty` 계수를 튜닝하여 초기 모델의 정책에서 너무 멀어지지 않도록 제어함으로써 답변의 일관성 유지.
-
-
-
-### 3. 발화자 감정 판별
-
-* **주요 목표:** 고령자의 인구통계학적 정보와 구술 텍스트를 함께 분석하여 정밀한 심리 상태(불안/우울)를 진단하는 AI 모델 연구.
-* **핵심 기능:**
-* **Multimodal Fusion:** 텍스트 임베딩(KoBERT)과 정형 데이터 임베딩(FT-Transformer)을 결합.
-* **Cross-Attention:** 서로 다른 모달리티 간 상호작용을 학습하여 정보 손실을 최소화한 Late Fusion 아키텍처.
-* **Multi-task Learning:** 4가지 심리 척도를 동시에 예측하여 모델의 일반화 성능 향상.
-
-
-* **Technical Decision:**
-* **Cross-Attention:** 텍스트와 정형 데이터를 단순 결합(Concat)하지 않고, 두 모달리티 간의 상관관계를 동적으로 반영할 수 있는 메커니즘 채택.
-
-
-* **Troubleshooting:**
-* **Issue:** 사전 학습된 KoBERT와 처음부터 학습하는 FT-Transformer 간의 학습 속도 차이로 인한 모델 불균형.
-* **Solution:** `Differential Learning Rate`를 적용하여 각 인코더별 최적의 학습률을 다르게 설정함으로써 멀티모달 융합 성능 극대화.
-
-
-
-### 4. 예술의 전당 예매 데이터 분석
-
-* **주요 목표:** 예매 데이터를 분석하여 적자 개선 및 흑자 전환을 위한 효율적인 마케팅/프로모션 전략 수립.
-* **핵심 과정:**
-* **Data Preprocessing:** 결측치 처리, 파생변수 생성, 범주형 데이터 변환을 통한 분석용 데이터셋 구축.
-* **EDA & Strategy:** 회원 등급, 공연 요일/시간, 장르별 선호도가 매출에 미치는 영향 분석.
-* **Dashboarding:** 경영진 및 마케팅 팀을 위한 Tableau 인터랙티브 대시보드 설계.
-
-
-* **Technical Decision:**
-* **Tableau:** 대규모 시계열 데이터(8개년)를 다각도에서 실시간으로 필터링하며 인사이트를 도출하기 위해 시각화 도구로 선정.
-
-
-* **Troubleshooting:**
-* **Issue:** 대규모 데이터 내 취소/환불 건이 매출 합산 시 중복 집계되거나 지표를 왜곡하는 문제.
-* **Solution:** 취소 건에 대한 `고유 거래 ID 식별 로직`을 구축하여 순매출과 취소율을 분리 정의함으로써 분석 데이터의 신뢰도 확보.
-
-
-
----
-
-ⓒ 2025. NLP & Data Analysis Portfolio. All rights reserved.
-
----
-
 -----
 
 # 📂 NLP & Data Analysis
@@ -155,6 +29,13 @@
       * **Smart Meeting Minutes:** 6가지 회의 유형(정보 전달, 문제 해결 등)을 자동 감지하여 구조화된 회의록 및 키워드 생성.
       * **AI Assistant Tools:** RAG(Retrieval-Augmented Generation) 기반 회의 내용 질의응답 및 실행 가능한 TODO/일정 자동 추출.
       * **Efficiency Dashboard:** 발화 빈도, 침묵 시간, 화자 간 상호작용 네트워크(Interaction Network) 등 회의 효율성 지표 시각화.
+  
+  * **Technical Decision:**
+      * **LangGraph:** 단순 선형 파이프라인이 아닌, 화자 정보 불확실 시 재추론을 수행하거나 회의 유형에 따라 로직을 분기하는 **Cyclic Graph**를 구현하기 위해 채택.
+
+  * **Troubleshooting:**
+      * **Issue:** Whisper 모델의 긴 침묵 구간에서 발생하는 환각(Hallucination) 및 중복 텍스트 생성 문제.
+      * **Solution:** `VAD(Voice Activity Detection)`를 전처리 단계에 도입하여 유효 발화 구간을 선별함으로써 데이터 노이즈 제거 및 요약 성능 개선.
 
 ### 2\. QA봇
 
@@ -164,6 +45,12 @@
       * **SFT (Supervised Fine-Tuning):** 질의응답 데이터셋을 통한 기본 답변 능력 학습.
       * **Reward Model:** 인간의 선호도를 모방하여 답변 품질을 평가하는 보상 모델 학습.
       * **PPO (Proximal Policy Optimization):** 보상 점수를 최대화하는 방향으로 생성 모델 정책 최적화.
+  
+  * **Technical Decision:**
+      * **LoRA & PEFT:** 8B급 이상의 모델 전체 튜닝은 리소스 소모가 크므로, 일부 파라미터만 학습하는 **LoRA**를 활용해 학습 효율과 성능의 균형을 맞춤.
+  * **Troubleshooting:**
+      * **Issue:** PPO 학습 중 보상 모델의 허점을 이용해 특정 패턴의 문구만 반복하여 보상 점수를 높게 받는 **Reward Hacking** 발생.
+      * **Solution:** `KL-Divergence Penalty` 계수를 튜닝하여 초기 모델의 정책에서 너무 멀어지지 않도록 제어함으로써 답변의 일관성 유지.
 
 ### 3\. 발화자 감정 판별
 
@@ -173,6 +60,14 @@
       * **Multimodal Fusion:** 텍스트 임베딩(KoBERT)과 정형 데이터 임베딩(FT-Transformer)을 Attention 메커니즘으로 융합.
       * **Cross-Attention:** 서로 다른 모달리티(Text ↔ Tabular) 간의 상호작용을 학습하여 정보 손실을 최소화한 Late Fusion 아키텍처.
       * **Multi-task Learning:** 4가지 심리 척도(Anxiety 1/2, Depression 1/2)를 동시에 예측하여 일반화 성능 향상.
+   
+  * **Technical Decision:**
+      * **Cross-Attention:** 텍스트와 정형 데이터를 단순 결합(Concat)하지 않고, 두 모달리티 간의 상관관계를 동적으로 반영할 수 있는 메커니즘 채택.
+
+  * **Troubleshooting:**
+      * **Issue:** 사전 학습된 KoBERT와 처음부터 학습하는 FT-Transformer 간의 학습 속도 차이로 인한 모델 불균형.
+      * **Solution:** `Differential Learning Rate`를 적용하여 각 인코더별 최적의 학습률을 다르게 설정함으로써 멀티모달 융합 성능 극대화.
+
 
 ### 4\. 예술의 전당 예매 데이터 분석
 
@@ -184,6 +79,12 @@
       * **Dashboarding:** 경영진 및 마케팅 팀을 위한 Tableau 대시보드 설계 (시간 흐름, 성별/연령별 분포 시각화).
   * **결과:** 맞춤형 공연 기획 및 타겟 마케팅을 통한 매출 극대화 방안 제시.
 
+* **Technical Decision:**
+    * **Tableau:** 대규모 시계열 데이터(8개년)를 다각도에서 실시간으로 필터링하며 인사이트를 도출하기 위해 시각화 도구로 선정.
+
+* **Troubleshooting:**
+    * **Issue:** 대규모 데이터 내 취소/환불 건이 매출 합산 시 중복 집계되거나 지표를 왜곡하는 문제.
+    * **Solution:** 취소 건에 대한 `고유 거래 ID 식별 로직`을 구축하여 순매출과 취소율을 분리 정의함으로써 분석 데이터의 신뢰도 확보.
 <br>
 
 -----
