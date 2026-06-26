@@ -197,4 +197,3 @@ instructor_summary.py → 강사 종합평가 생성 (수동 실행)
 
 - `.env` 파일은 Git에 포함되지 않습니다. 직접 생성해야 합니다.
 - `uploads/`, `backup/`, `results/`, `results_unified/`, `node_modules/`, `json/` 폴더는 `.gitignore`에 추가를 권장합니다.
-- 본 시스템은 STT 기반 강의 진행 품질(Kirkpatrick L1~2)을 측정하며, 수강생 학습 성과(L3~4)는 측정하지 않습니다.
