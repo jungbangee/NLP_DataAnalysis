@@ -39,7 +39,19 @@ select{background:var(--surf2);border:0.5px solid var(--border);border-radius:6p
 <main>
   <div id="loading" class="loading">⏳ MongoDB에서 데이터 로딩 중...</div>
   <div id="app" style="display:none">
-    <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap" id="itags"></div>
+    <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center" id="itags"></div>
+    <!-- 날짜 범위 필터 -->
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+      <span style="font-size:12px;color:var(--muted)">📅 기간:</span>
+      <input type="date" id="dateFrom" onchange="applyDateFilter()"
+        style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:12px;outline:none">
+      <span style="font-size:12px;color:var(--muted)">~</span>
+      <input type="date" id="dateTo" onchange="applyDateFilter()"
+        style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:12px;outline:none">
+      <button onclick="resetDateFilter()"
+        style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--muted);font-size:12px;cursor:pointer">초기화</button>
+      <span id="dateFilterInfo" style="font-size:12px;color:var(--muted)"></span>
+    </div>
     <div class="tab-row" id="tabs">
       <button class="tab-btn active" onclick="sw('radar')">📡 카테고리 비교</button>
       <button class="tab-btn" onclick="sw('trend')">📈 날짜별 추이</button>
@@ -109,28 +121,72 @@ const CATE_NUM_MAP = {
 };
 
 // ── 데이터 로드 ──────────────────────────────────────────────
-let INS=[], active=new Set(), selCat=CATE_NAMES[0], gapA='', gapB='';
+let INS=[], INS_FULL=[], active=new Set(), selCat=CATE_NAMES[0], gapA='', gapB='';
 let charts={};
 
-async function loadData(){
-  const res  = await fetch('/api/results?limit=2000');
-  const docs = await res.json();
-
-  // 강사별 그룹핑
+function buildINS(docs){
   const byInstructor = {};
   docs.forEach(doc=>{
     const name = doc.instructor || doc.course_id || '미확인';
     if(!byInstructor[name]) byInstructor[name]=[];
     byInstructor[name].push(doc);
   });
-
-  INS = Object.entries(byInstructor).map(([name, records], idx)=>({
-    id:    name,
-    name,
+  return Object.entries(byInstructor).map(([name, records], idx)=>({
+    id: name, name,
     color: COLORS[idx % COLORS.length],
     alpha: hexAlpha(COLORS[idx % COLORS.length], 0.15),
     records: records.sort((a,b)=>new Date(a.date||a.timestamp)-new Date(b.date||b.timestamp)),
   }));
+}
+
+function applyDateFilter(){
+  const from = document.getElementById('dateFrom').value;
+  const to   = document.getElementById('dateTo').value;
+  // to 날짜 당일 포함: to 다음날보다 작은 것까지 포함
+  const toNext = to ? new Date(new Date(to).getTime() + 86400000).toISOString().slice(0,10) : '';
+  INS = INS_FULL.map(ins=>({
+    ...ins,
+    records: ins.records.filter(r=>{
+      const d = (r.date||'').slice(0,10);
+      return (!from || d >= from) && (!toNext || d < toNext);
+    })
+  })).filter(ins=>ins.records.length > 0);
+  const info = INS.reduce((s,i)=>s+i.records.length,0);
+  document.getElementById('dateFilterInfo').textContent = INS.length+'명 / '+info+'건';
+  active = new Set(INS.map(i=>i.id));
+  if(INS.length >= 2){ gapA=INS[0].id; gapB=INS[1].id; }
+
+  // 초기 로드 전이면 무시
+  if(!charts.radar) return;
+
+  buildTags();
+  updRadar();
+  updTrend();
+  buildGapSelects(); updGap();
+  updGrowth(); buildGrowthCards();
+  buildSum();
+}
+
+function resetDateFilter(){
+  const allDates = INS_FULL.flatMap(i=>i.records.map(r=>r.date||'')).filter(Boolean).sort();
+  document.getElementById('dateFrom').value = allDates[0]||'';
+  document.getElementById('dateTo').value   = allDates[allDates.length-1]||'';
+  document.getElementById('dateFilterInfo').textContent = '';
+  applyDateFilter();
+}
+
+async function loadData(){
+  const res  = await fetch('/api/results?limit=2000');
+  const docs = await res.json();
+
+  const allDates = docs.map(d=>d.date||'').filter(Boolean).sort();
+  if(allDates.length){
+    document.getElementById('dateFrom').value = allDates[0];
+    document.getElementById('dateTo').value   = allDates[allDates.length-1];
+  }
+
+  INS_FULL = buildINS(docs);
+  INS = INS_FULL;
 
   if(INS.length < 2){
     document.getElementById('loading').textContent = '⚠️ 비교하려면 강사가 2명 이상 필요합니다. (현재 '+INS.length+'명)';
@@ -138,8 +194,7 @@ async function loadData(){
   }
 
   active = new Set(INS.map(i=>i.id));
-  gapA = INS[0].id;
-  gapB = INS[1].id;
+  gapA = INS[0].id; gapB = INS[1].id;
 
   document.getElementById('loading').style.display='none';
   document.getElementById('app').style.display='block';

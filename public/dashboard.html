@@ -117,27 +117,65 @@ main{padding:28px;max-width:1300px;margin:0 auto}
 
   <div class="upload-panel">
     <h2>📤 강의 분석 시작</h2>
-    <div class="upload-row">
-      <div class="field" style="max-width:240px">
-        <label>강의 스크립트 (.txt)</label>
-        <input type="file" id="fileInput" accept=".txt">
-        <label class="file-label" for="fileInput" id="fileLabel">📄 파일 선택...</label>
+    <!-- 단일/일괄 탭 -->
+    <div style="display:flex;gap:4px;margin-bottom:16px">
+      <button id="tabSingle" onclick="switchTab('single')"
+        style="padding:6px 16px;border-radius:8px;border:1px solid var(--accent);background:rgba(88,166,255,.15);color:var(--accent);font-size:13px;font-weight:700;cursor:pointer">
+        단일 파일
+      </button>
+      <button id="tabBulk" onclick="switchTab('bulk')"
+        style="padding:6px 16px;border-radius:8px;border:0.5px solid var(--border);background:transparent;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer">
+        일괄 업로드
+      </button>
+    </div>
+
+    <!-- 단일 업로드 -->
+    <div id="panelSingle">
+      <div class="upload-row">
+        <div class="field" style="max-width:240px">
+          <label>강의 스크립트 (.txt)</label>
+          <input type="file" id="fileInput" accept=".txt">
+          <label class="file-label" for="fileInput" id="fileLabel">📄 파일 선택...</label>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn-analyze" id="analyzeBtn" disabled onclick="startAnalysis()">분석 시작</button>
+          <button id="cancelBtn" style="display:none;background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.3);border-radius:8px;padding:8px 18px;color:#f85149;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s" onclick="cancelAnalysis()">✕ 취소</button>
+        </div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn-analyze" id="analyzeBtn" disabled onclick="startAnalysis()">분석 시작</button>
-        <button id="cancelBtn" style="display:none;background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.3);border-radius:8px;padding:8px 18px;color:#f85149;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s" onclick="cancelAnalysis()">✕ 취소</button>
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-steps" style="margin-top:16px">
+          <div class="step-chip" id="step1">① 언어표현</div>
+          <div class="step-chip" id="step2">② 도입구조</div>
+          <div class="step-chip" id="step3">③ 개념전달</div>
+          <div class="step-chip" id="step4">④ 실습지도</div>
+          <div class="step-chip" id="step5">⑤ 상호작용</div>
+        </div>
+        <div class="progress-bar-bg" style="margin-top:10px"><div class="progress-bar-fill" id="progressBar"></div></div>
+        <div class="prog-label" id="progressLabel">분석 준비 중...</div>
       </div>
     </div>
-    <div class="progress-wrap" id="progressWrap">
-      <div class="progress-steps" style="margin-top:16px">
-        <div class="step-chip" id="step1">① 언어표현</div>
-        <div class="step-chip" id="step2">② 도입구조</div>
-        <div class="step-chip" id="step3">③ 개념전달</div>
-        <div class="step-chip" id="step4">④ 실습지도</div>
-        <div class="step-chip" id="step5">⑤ 상호작용</div>
+
+    <!-- 일괄 업로드 -->
+    <div id="panelBulk" style="display:none">
+      <div class="upload-row">
+        <div class="field">
+          <label>강의 스크립트 여러 개 선택 (.txt)</label>
+          <input type="file" id="bulkFileInput" accept=".txt" multiple onchange="onBulkFileChange()">
+          <label class="file-label" for="bulkFileInput" id="bulkFileLabel">📂 파일 여러 개 선택...</label>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn-analyze" id="bulkAnalyzeBtn" disabled onclick="startBulkAnalysis()">일괄 분석 시작</button>
+          <button id="bulkCancelBtn" style="display:none;background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.3);border-radius:8px;padding:8px 18px;color:#f85149;font-size:13px;font-weight:600;cursor:pointer" onclick="cancelBulkAnalysis()">✕ 취소</button>
+        </div>
       </div>
-      <div class="progress-bar-bg" style="margin-top:10px"><div class="progress-bar-fill" id="progressBar"></div></div>
-      <div class="prog-label" id="progressLabel">분석 준비 중...</div>
+      <!-- 선택된 파일 목록 -->
+      <div id="bulkFileList" style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px"></div>
+      <!-- 진행 현황 -->
+      <div id="bulkProgress" style="display:none;margin-top:16px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px" id="bulkProgressLabel">준비 중...</div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="bulkProgressBar" style="width:0%"></div></div>
+        <div id="bulkLog" style="margin-top:10px;max-height:160px;overflow-y:auto;background:var(--surf2);border-radius:8px;padding:10px;font-size:12px;color:var(--muted)"></div>
+      </div>
     </div>
   </div>
 
@@ -154,15 +192,36 @@ main{padding:28px;max-width:1300px;margin:0 auto}
   </div>
 
   <div class="history-section" id="historySection" style="display:none">
-    <h3>📋 분석 이력</h3>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+      <h3 style="margin:0">📋 분석 이력</h3>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span id="historyCount" style="font-size:12px;color:var(--muted)"></span>
+        <select id="historyPageSize" onchange="renderHistoryList(_historyFiltered)"
+          style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:12px;outline:none">
+          <option value="10" selected>10개씩</option>
+          <option value="20">20개씩</option>
+          <option value="50">50개씩</option>
+          <option value="0">전체</option>
+        </select>
+        <button id="historyPrevBtn" onclick="changeHistoryPage(-1)"
+          style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--muted);font-size:12px;cursor:pointer">◀</button>
+        <span id="historyPageLabel" style="font-size:12px;color:var(--muted);min-width:40px;text-align:center"></span>
+        <button id="historyNextBtn" onclick="changeHistoryPage(1)"
+          style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--muted);font-size:12px;cursor:pointer">▶</button>
+      </div>
+    </div>
     <!-- 필터 -->
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center">
-      <input id="filterInstructor" type="text" placeholder="강사명 검색" oninput="filterHistory()"
-        style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:13px;outline:none;width:160px">
-      <input id="filterDate" type="date" oninput="filterHistory()"
+      <input id="filterInstructor" type="text" placeholder="🔍 강사명" oninput="filterHistory()"
+        style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:13px;outline:none;width:130px">
+      <input id="filterCourse" type="text" placeholder="🔍 과목명" oninput="filterHistory()"
+        style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:13px;outline:none;width:130px">
+      <input id="filterDateFrom" type="date" oninput="filterHistory()"
+        style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:13px;outline:none">
+      <span style="font-size:12px;color:var(--muted)">~</span>
+      <input id="filterDateTo" type="date" oninput="filterHistory()"
         style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:13px;outline:none">
       <button onclick="clearFilter()" style="background:transparent;border:0.5px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--muted);font-size:12px;cursor:pointer">초기화</button>
-      <span id="historyCount" style="font-size:12px;color:var(--muted);margin-left:4px"></span>
     </div>
     <!-- 리스트 -->
     <div id="historyList" style="display:flex;flex-direction:column;gap:6px"></div>
@@ -484,30 +543,55 @@ function renderDetails(grouped, cats){
   }
 }
 
-let _historyAll = [];
+let _historyAll = [], _historyFiltered = [], _historyPage = 0;
 
 async function loadHistory(){
   try{
     const res  = await fetch('/api/history');
     const list = await res.json();
     if(!list.length) return;
-    _historyAll = list;
+    _historyAll      = list;
+    _historyFiltered = list;
     document.getElementById('historySection').style.display = 'block';
     renderHistoryList(list);
   }catch(_){}
 }
 
-function renderHistoryList(list){
-  const container = document.getElementById('historyList');
-  container.innerHTML = '';
-  document.getElementById('historyCount').textContent = `총 ${list.length}건`;
+function changeHistoryPage(dir){
+  const pageSize = parseInt(document.getElementById('historyPageSize').value);
+  if(pageSize === 0) return;
+  const totalPages = Math.ceil(_historyFiltered.length / pageSize);
+  _historyPage = Math.max(0, Math.min(_historyPage + dir, totalPages - 1));
+  renderHistoryList(_historyFiltered);
+}
 
-  if(!list.length){
+function renderHistoryList(list){
+  _historyFiltered = list;
+  const container  = document.getElementById('historyList');
+  container.innerHTML = '';
+
+  const pageSize   = parseInt(document.getElementById('historyPageSize')?.value || '10');
+  const totalPages = pageSize === 0 ? 1 : Math.ceil(list.length / pageSize);
+  _historyPage     = Math.max(0, Math.min(_historyPage, totalPages - 1));
+  const start      = pageSize === 0 ? 0 : _historyPage * pageSize;
+  const end        = pageSize === 0 ? list.length : start + pageSize;
+  const paginated  = list.slice(start, end);
+
+  // 카운트/페이지 UI 업데이트
+  document.getElementById('historyCount').textContent = `총 ${list.length}건`;
+  const pageEl  = document.getElementById('historyPageLabel');
+  const prevBtn = document.getElementById('historyPrevBtn');
+  const nextBtn = document.getElementById('historyNextBtn');
+  if(pageEl)  pageEl.textContent  = pageSize === 0 ? '' : `${_historyPage+1} / ${totalPages}`;
+  if(prevBtn) prevBtn.style.opacity = (_historyPage === 0 || pageSize === 0) ? '0.3' : '1';
+  if(nextBtn) nextBtn.style.opacity = (_historyPage >= totalPages-1 || pageSize === 0) ? '0.3' : '1';
+
+  if(!paginated.length){
     container.innerHTML = '<div style="text-align:center;padding:28px;color:var(--muted);font-size:13px">검색 결과가 없습니다</div>';
     return;
   }
 
-  list.forEach(item=>{
+  paginated.forEach(item=>{
     const instructor = item.instructor || '미확인';
     const date       = item.date       || item.timestamp?.slice(0,10) || '-';
     const courseId   = item.course_id  || '-';
@@ -597,22 +681,112 @@ async function deleteResult(resultFile){
 }
 
 function filterHistory(){
-  const instrQ = document.getElementById('filterInstructor').value.trim().toLowerCase();
-  const dateQ  = document.getElementById('filterDate').value.trim();
+  const instrQ  = document.getElementById('filterInstructor').value.trim().toLowerCase();
+  const courseQ = document.getElementById('filterCourse').value.trim().toLowerCase();
+  const dateFrom= document.getElementById('filterDateFrom').value;
+  const dateTo  = document.getElementById('filterDateTo').value;
   const filtered = _historyAll.filter(item=>{
-    const instr = (item.instructor||'').toLowerCase();
-    const date  = (item.date||'');
-    if(instrQ && !instr.includes(instrQ)) return false;
-    if(dateQ  && date !== dateQ)          return false;
+    const date = item.date || item.timestamp?.slice(0,10) || '';
+    if(instrQ  && !(item.instructor||'').toLowerCase().includes(instrQ)) return false;
+    if(courseQ && !(item.course_id||'').toLowerCase().includes(courseQ)) return false;
+    if(dateFrom && date < dateFrom) return false;
+    if(dateTo   && date > dateTo)   return false;
     return true;
   });
+  _historyPage = 0;
   renderHistoryList(filtered);
 }
 
 function clearFilter(){
   document.getElementById('filterInstructor').value = '';
-  document.getElementById('filterDate').value = '';
+  document.getElementById('filterCourse').value     = '';
+  document.getElementById('filterDateFrom').value   = '';
+  document.getElementById('filterDateTo').value     = '';
+  _historyPage = 0;
   renderHistoryList(_historyAll);
+}
+
+// ── 탭 전환 ────────────────────────────────────────────────
+function switchTab(tab){
+  const isSingle = tab === 'single';
+  document.getElementById('panelSingle').style.display = isSingle ? '' : 'none';
+  document.getElementById('panelBulk').style.display   = isSingle ? 'none' : '';
+  document.getElementById('tabSingle').style.background = isSingle ? 'rgba(88,166,255,.15)' : 'transparent';
+  document.getElementById('tabSingle').style.color      = isSingle ? 'var(--accent)' : 'var(--muted)';
+  document.getElementById('tabSingle').style.border     = isSingle ? '1px solid var(--accent)' : '0.5px solid var(--border)';
+  document.getElementById('tabBulk').style.background   = isSingle ? 'transparent' : 'rgba(88,166,255,.15)';
+  document.getElementById('tabBulk').style.color        = isSingle ? 'var(--muted)' : 'var(--accent)';
+  document.getElementById('tabBulk').style.border       = isSingle ? '0.5px solid var(--border)' : '1px solid var(--accent)';
+}
+
+// ── 일괄 업로드 ─────────────────────────────────────────────
+let _bulkAbort = false;
+
+function onBulkFileChange(){
+  const files = document.getElementById('bulkFileInput').files;
+  document.getElementById('bulkAnalyzeBtn').disabled = !files.length;
+  document.getElementById('bulkFileLabel').textContent = files.length ? `📂 ${files.length}개 선택됨` : '📂 파일 여러 개 선택...';
+  const list = document.getElementById('bulkFileList');
+  list.innerHTML = [...files].map(f=>`<span style="background:var(--surf2);border:0.5px solid var(--border);border-radius:6px;padding:3px 8px;font-size:11px;color:var(--muted)">${f.name}</span>`).join('');
+}
+
+async function startBulkAnalysis(){
+  const input = document.getElementById('bulkFileInput');
+  if(!input.files.length) return;
+  _bulkAbort = false;
+  document.getElementById('bulkAnalyzeBtn').disabled = true;
+  document.getElementById('bulkCancelBtn').style.display = '';
+  document.getElementById('bulkProgress').style.display = '';
+  const log = document.getElementById('bulkLog');
+  log.innerHTML = '';
+
+  const fd = new FormData();
+  [...input.files].forEach(f => fd.append('files', f));
+
+  const response = await fetch('/api/analyze/bulk', { method:'POST', body: fd });
+  const reader   = response.body.getReader();
+  const decoder  = new TextDecoder();
+  let buf = '';
+
+  while(true){
+    const { done, value } = await reader.read();
+    if(done || _bulkAbort) break;
+    buf += decoder.decode(value, { stream: true });
+    const lines = buf.split('\n');
+    buf = lines.pop();
+    for(const line of lines){
+      if(!line.startsWith('data:')) continue;
+      try{
+        const ev = JSON.parse(line.slice(5));
+        if(ev.type === 'bulk_start'){
+          document.getElementById('bulkProgressLabel').textContent = `총 ${ev.total}개 파일 분석 시작`;
+        } else if(ev.type === 'file_start'){
+          document.getElementById('bulkProgressLabel').textContent = `[${ev.index}/${ev.total}] ${ev.filename} 분석 중...`;
+          document.getElementById('bulkProgressBar').style.width = ((ev.index-1)/ev.total*100)+'%';
+        } else if(ev.type === 'progress'){
+          log.innerHTML += `<div>  └ [${ev.fileIndex}/${ev.total}] ${ev.filename} — ${ev.label}</div>`;
+          log.scrollTop = log.scrollHeight;
+        } else if(ev.type === 'file_done'){
+          document.getElementById('bulkProgressBar').style.width = (ev.index/ev.total*100)+'%';
+          log.innerHTML += `<div style="color:var(--green)">✅ ${ev.filename} 완료 (${ev.instructor||'강사미확인'} / ${ev.date})</div>`;
+          log.scrollTop = log.scrollHeight;
+        } else if(ev.type === 'bulk_done'){
+          document.getElementById('bulkProgressLabel').textContent = `✅ 전체 ${ev.total}개 파일 분석 완료!`;
+          document.getElementById('bulkProgressBar').style.width = '100%';
+          document.getElementById('bulkCancelBtn').style.display = 'none';
+          document.getElementById('bulkAnalyzeBtn').disabled = false;
+          loadHistory();
+        }
+      } catch(_){}
+    }
+  }
+}
+
+function cancelBulkAnalysis(){
+  _bulkAbort = true;
+  document.getElementById('bulkCancelBtn').style.display = 'none';
+  document.getElementById('bulkAnalyzeBtn').disabled = false;
+  document.getElementById('bulkProgressLabel').textContent = '취소됨';
 }
 
 async function loadResult(filename){

@@ -56,6 +56,18 @@ main{padding:32px 28px;max-width:1200px;margin:0 auto}
 
   <div class="filter-row">
     <input class="filter-input" id="filterName" type="text" placeholder="🔍 강사명 검색" oninput="filterCards()">
+    <select id="filterGrade" onchange="filterCards()" style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;outline:none">
+      <option value="">전체 등급</option>
+      <option value="우수">우수</option>
+      <option value="양호">양호</option>
+      <option value="보통">보통</option>
+      <option value="미흡">미흡</option>
+      <option value="부족">부족</option>
+    </select>
+    <select id="filterCourse" onchange="filterCards()" style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;outline:none">
+      <option value="">전체 과목</option>
+    </select>
+    <button onclick="resetFilter()" style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--muted);font-size:12px;cursor:pointer">초기화</button>
     <span id="totalCount" style="font-size:12px;color:var(--muted)"></span>
   </div>
 
@@ -66,13 +78,29 @@ main{padding:32px 28px;max-width:1200px;margin:0 auto}
 
 <script>
 const COLORS = ['#5B7FFF','#FF7A5C','#2DC88A','#FFC542','#BC8CFF','#FF5CA8','#5CD8E5','#FF9F43'];
-let _all = [];
+let _all = [], _grades = {}, _benchmark = {};
+
+const CATE_LABELS = { cate1:'언어 표현', cate2:'도입·구조', cate3:'개념 명확', cate4:'예시·실습', cate5:'상호작용' };
 
 async function load(){
   try{
-    const res  = await fetch('/api/instructors');
-    const data = await res.json();
+    const [data, summaries, benchmark] = await Promise.all([
+      fetch('/api/instructors').then(r=>r.json()),
+      fetch('/api/instructor-grades').then(r=>r.json()).catch(()=>({})),
+      fetch('/api/benchmark').then(r=>r.json()).catch(()=>({})),
+    ]);
+    _benchmark = benchmark;
+    // 등급 맵핑
+    if(Array.isArray(summaries)){
+      summaries.forEach(s=>{ if(s.instructor) _grades[s.instructor] = s.proficiency_grade||''; });
+    }
     _all = data.sort((a,b)=>b.lecture_count - a.lecture_count);
+
+    // 과목 필터 옵션 구성
+    const allCourses = [...new Set(_all.flatMap(i=>i.courses||[]))].sort();
+    const sel = document.getElementById('filterCourse');
+    allCourses.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); });
+
     render(_all);
   }catch(e){
     document.getElementById('grid').innerHTML = `<div class="empty">❌ 데이터 로드 실패: ${e.message}</div>`;
@@ -88,15 +116,35 @@ function render(list){
     return;
   }
 
-  grid.innerHTML = list.map((ins, idx)=>{
-    const color  = COLORS[idx % COLORS.length];
-    const alpha  = hexAlpha(color, 0.15);
-    const border = hexAlpha(color, 0.3);
+  // 벤치마크 바 생성
+  const bmarkHtml = Object.entries(CATE_LABELS).map(([ck, label])=>{
+    const pct = _benchmark[ck] || 0;
+    return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+      <span style="font-size:10px;color:var(--muted);min-width:58px">${label}</span>
+      <div style="flex:1;height:4px;background:var(--surf2);border-radius:2px">
+        <div style="width:${pct}%;height:100%;background:rgba(88,166,255,.5);border-radius:2px"></div>
+      </div>
+      <span style="font-size:10px;color:var(--muted);min-width:28px;text-align:right">${pct}</span>
+    </div>`;
+  }).join('');
+
+  // 벤치마크 패널
+  const benchmarkPanel = `<div style="background:var(--surf);border:0.5px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:20px">
+    <div style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--muted)">📊 전체 강사 평균 벤치마크 (100점 기준)</div>
+    ${bmarkHtml}
+  </div>`;
+
+  grid.innerHTML = benchmarkPanel + list.map((ins, idx)=>{
+    const color   = COLORS[idx % COLORS.length];
+    const alpha   = hexAlpha(color, 0.15);
+    const border  = hexAlpha(color, 0.3);
     const initial = ins.instructor !== '미확인' ? ins.instructor[0] : '?';
     const uniqueCourses = [...new Set(ins.courses||[])];
     const courses = uniqueCourses.slice(0,4).map(c=>
       `<span class="course-tag">${c}</span>`
     ).join('') + (uniqueCourses.length > 4 ? `<span class="course-tag">+${uniqueCourses.length-4}</span>` : '');
+    const grade = _grades[ins.instructor] || '';
+    const gradeColor = {우수:'#3fb950',양호:'#58a6ff',보통:'#d29922',미흡:'#f85149',부족:'#ff6e40'}[grade] || 'var(--muted)';
 
     return `<a class="card" href="/instructor?name=${encodeURIComponent(ins.instructor)}">
       <div class="card-top">
@@ -104,6 +152,7 @@ function render(list){
         <div>
           <div class="card-name">${ins.instructor} 강사</div>
           <div class="card-sub">마지막 강의: ${ins.last_date||'-'}</div>
+          ${grade ? `<span style="font-size:11px;font-weight:700;color:${gradeColor}">${grade}</span>` : ''}
         </div>
       </div>
       <div class="divider"></div>
@@ -123,8 +172,21 @@ function render(list){
 }
 
 function filterCards(){
-  const q = document.getElementById('filterName').value.trim().toLowerCase();
-  render(q ? _all.filter(i=>(i.instructor||'').toLowerCase().includes(q)) : _all);
+  const q      = document.getElementById('filterName').value.trim().toLowerCase();
+  const grade  = document.getElementById('filterGrade').value;
+  const course = document.getElementById('filterCourse').value;
+  let list = _all;
+  if(q)      list = list.filter(i=>(i.instructor||'').toLowerCase().includes(q));
+  if(grade)  list = list.filter(i=>_grades[i.instructor] === grade);
+  if(course) list = list.filter(i=>(i.courses||[]).includes(course));
+  render(list);
+}
+
+function resetFilter(){
+  document.getElementById('filterName').value = '';
+  document.getElementById('filterGrade').value = '';
+  document.getElementById('filterCourse').value = '';
+  render(_all);
 }
 
 function hexAlpha(hex, a){

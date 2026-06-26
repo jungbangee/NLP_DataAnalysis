@@ -486,6 +486,103 @@ app.post('/api/analyze', requireAuth, upload.single('file'), async (req, res) =>
   res.end();
 });
 
+// ── 라우트: 일괄 분석 (여러 파일) ───────────────────────────
+app.post('/api/analyze/bulk', requireAuth, upload.array('files', 50), async (req, res) => {
+  if (!req.files || !req.files.length) return res.status(400).json({ error: '파일이 필요합니다.' });
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  const send = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`);
+
+  const geminiKey = req.body.gemini_key || process.env.GCP_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
+  const total = req.files.length;
+
+  send({ type: 'bulk_start', total });
+
+  for (let fi = 0; fi < total; fi++) {
+    const file = req.files[fi];
+    const txtPath  = file.path;
+    const origName = file.originalname;
+    const fileMeta = parseFileMeta(origName);
+
+    send({ type: 'file_start', index: fi + 1, total, filename: origName });
+
+    const allResults = {};
+    for (let i = 0; i < CATE_SCRIPTS.length; i++) {
+      const { key, script, label } = CATE_SCRIPTS[i];
+      send({ type: 'progress', fileIndex: fi + 1, step: i + 1, total: CATE_SCRIPTS.length, label, filename: origName });
+      if (!fs.existsSync(script)) { allResults[key] = { error: `스크립트 없음: ${script}` }; continue; }
+      try {
+        const result = await runPython(script, txtPath, geminiKey);
+        allResults[key] = { items: result.items || Object.values(result)[0] || result };
+      } catch (err) {
+        allResults[key] = { error: err.message };
+      }
+    }
+
+    try { fs.unlinkSync(txtPath); } catch (_) {}
+
+    const meta       = lookupMeta(fileMeta.date, fileMeta.course_id);
+    const instructor = meta?.instructor || '';
+    const timestamp  = new Date();
+
+    for (const [cateKey, cateVal] of Object.entries(allResults)) {
+      try {
+        await CategoryResult.findOneAndUpdate(
+          { date: fileMeta.date, course_id: fileMeta.course_id, category: cateKey },
+          { timestamp, filename: origName, date: fileMeta.date, course_id: fileMeta.course_id, instructor, category: cateKey, items: cateVal.items || cateVal, error: cateVal.error || '' },
+          { upsert: true, new: true }
+        );
+      } catch (dbErr) { console.error(`❌ MongoDB 저장 실패 (${cateKey}):`, dbErr.message); }
+    }
+
+    send({ type: 'file_done', index: fi + 1, total, filename: origName, instructor, date: fileMeta.date, course_id: fileMeta.course_id });
+  }
+
+  send({ type: 'bulk_done', total });
+  res.end();
+});
+
+// ── 라우트: 전체 평균 벤치마크 API ──────────────────────────
+app.get('/api/benchmark', requireAuth, async (req, res) => {
+  try {
+    const docs = await CategoryResult.find({}, { category: 1, items: 1 }).lean();
+    const sums = {}, cnts = {};
+    const ITEM_CATE = {
+      '1.1':'cate1','1.2':'cate1','1.3':'cate1',
+      '2.1':'cate2','2.2':'cate2','2.3':'cate2','2.4':'cate2','2.5':'cate2',
+      '3.1':'cate3','3.2':'cate3','3.3':'cate3','3.4':'cate3',
+      '4.1':'cate4','4.2':'cate4','4.3':'cate4',
+      '5.1':'cate5','5.2':'cate5','5.3':'cate5',
+    };
+    docs.forEach(doc => {
+      const ck = doc.category;
+      if (!sums[ck]) { sums[ck] = 0; cnts[ck] = 0; }
+      const items = doc.items || {};
+      const vals = Object.values(items).map(v => parseFloat(v?.score ?? null)).filter(v => !isNaN(v));
+      if (vals.length) { sums[ck] += vals.reduce((a, b) => a + b, 0) / vals.length; cnts[ck]++; }
+    });
+    const benchmark = {};
+    for (const ck of Object.keys(sums)) {
+      benchmark[ck] = cnts[ck] ? Math.round((sums[ck] / cnts[ck]) * 100 / 5) : 0;
+    }
+    res.json(benchmark);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── 라우트: 강사 등급 목록 ───────────────────────────────────
+app.get('/api/instructor-grades', requireAuth, async (req, res) => {
+  try {
+    const docs = await InstructorSummary.find({}, { instructor: 1, proficiency_grade: 1 }).lean();
+    res.json(docs);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── 라우트: 강사 목록 API ────────────────────────────────────
 // 강사별 강의 수, 최근 분석일, 평균 점수 반환
 app.get('/api/instructors', requireAuth, async (req, res) => {

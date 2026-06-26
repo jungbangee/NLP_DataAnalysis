@@ -220,7 +220,24 @@ main{padding:32px 28px;max-width:1100px;margin:0 auto}
     </div>
 
     <!-- 강의 이력 -->
-    <div class="section-title">📋 강의 이력</div>
+    <div class="section-title" style="justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <span>📋 강의 이력</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:12px;color:var(--muted)" id="lectureCountLabel"></span>
+        <select id="lecturePageSize" onchange="renderLectures()"
+          style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--text);font-size:12px;outline:none">
+          <option value="5">5개씩</option>
+          <option value="10" selected>10개씩</option>
+          <option value="20">20개씩</option>
+          <option value="0">전체</option>
+        </select>
+        <button id="lecturePrevBtn" onclick="changeLecturePage(-1)"
+          style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--muted);font-size:12px;cursor:pointer">◀</button>
+        <span id="lecturePageLabel" style="font-size:12px;color:var(--muted)"></span>
+        <button id="lectureNextBtn" onclick="changeLecturePage(1)"
+          style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--muted);font-size:12px;cursor:pointer">▶</button>
+      </div>
+    </div>
     <div id="lectureList"><div class="loading" style="padding:20px">이력 로딩 중...</div></div>
   </div>
 </main>
@@ -429,6 +446,16 @@ function renderSummary(d){
 }
 
 // ── 강의 이력 렌더링 ──────────────────────────────────────────
+let _lecturePage = 0;
+
+function changeLecturePage(dir){
+  const pageSize = parseInt(document.getElementById('lecturePageSize').value);
+  if(pageSize === 0) return;
+  const totalPages = Math.ceil(_lectures.length / pageSize);
+  _lecturePage = Math.max(0, Math.min(_lecturePage + dir, totalPages - 1));
+  renderLectures();
+}
+
 function renderLectures(){
   const el = document.getElementById('lectureList');
   if(!el) return;
@@ -436,6 +463,23 @@ function renderLectures(){
     el.innerHTML='<div style="color:var(--muted);font-size:13px;padding:12px">강의 이력이 없습니다.</div>';
     return;
   }
+
+  const pageSize   = parseInt(document.getElementById('lecturePageSize')?.value || '10');
+  const totalPages = pageSize === 0 ? 1 : Math.ceil(_lectures.length / pageSize);
+  _lecturePage     = Math.max(0, Math.min(_lecturePage, totalPages - 1));
+  const start      = pageSize === 0 ? 0 : _lecturePage * pageSize;
+  const end        = pageSize === 0 ? _lectures.length : start + pageSize;
+  const paginated  = _lectures.slice(start, end);
+
+  // 페이지 컨트롤 업데이트
+  const countEl = document.getElementById('lectureCountLabel');
+  const pageEl  = document.getElementById('lecturePageLabel');
+  const prevBtn = document.getElementById('lecturePrevBtn');
+  const nextBtn = document.getElementById('lectureNextBtn');
+  if(countEl) countEl.textContent = `총 ${_lectures.length}건`;
+  if(pageEl)  pageEl.textContent  = pageSize === 0 ? '' : `${_lecturePage+1} / ${totalPages}`;
+  if(prevBtn) prevBtn.style.opacity = (_lecturePage === 0 || pageSize === 0) ? '0.3' : '1';
+  if(nextBtn) nextBtn.style.opacity = (_lecturePage >= totalPages-1 || pageSize === 0) ? '0.3' : '1';
 
   const CATE_NUM_MAP = {
     cate1:{'1':'1.1','2':'1.2','3':'1.3'},
@@ -458,7 +502,7 @@ function renderLectures(){
     return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
   }
 
-  el.innerHTML = _lectures.map(doc=>{
+  el.innerHTML = paginated.map(doc=>{
     const key = encodeURIComponent(doc.resultFile);
     const ts  = new Date(doc.timestamp).toLocaleString('ko-KR');
     const badges = ['cate1','cate2','cate3','cate4','cate5'].map((k,i)=>{
@@ -499,6 +543,7 @@ async function deleteLecture(date, course_id){
     if(!res.ok) throw new Error(data.error||'삭제 실패');
     // 목록에서 제거 후 재렌더
     _lectures = _lectures.filter(d => !(d.date===date && d.course_id===course_id));
+    _lecturePage = 0;
     renderLectures();
     // 강의가 없어지면 강사 페이지에서 나가기
     if(_lectures.length === 0){
