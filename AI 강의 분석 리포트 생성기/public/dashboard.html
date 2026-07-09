@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 강의분석 대시보드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0d1117;--surf:#161b22;--surf2:#21262d;--border:rgba(255,255,255,0.08);--accent:#58a6ff;--green:#3fb950;--yellow:#d29922;--orange:#f0883e;--red:#f85149;--purple:#bc8cff;--text:#e6edf3;--muted:rgba(230,237,243,0.5)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR','맑은 고딕','Malgun Gothic','Apple SD Gothic Neo','Segoe UI',sans-serif;min-height:100vh}
+header{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:56px;background:var(--surf);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200}
+.brand{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:700}
+.brand-icon{width:34px;height:34px;background:linear-gradient(135deg,#58a6ff,#3fb950);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.logout{color:var(--muted);font-size:13px;text-decoration:none;transition:color .2s}
+.logout:hover{color:var(--red)}
+main{padding:28px;max-width:1300px;margin:0 auto}
+.upload-panel{background:var(--surf);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:24px}
+.upload-panel h2{font-size:13px;font-weight:700;margin-bottom:16px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.upload-row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.field{display:flex;flex-direction:column;gap:6px;flex:1;min-width:180px}
+.field label{font-size:12px;color:var(--muted);font-weight:600}
+.field input[type=password]{background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:9px 13px;color:var(--text);font-size:14px;outline:none;transition:border .2s}
+.field input[type=password]:focus{border-color:var(--accent)}
+#fileInput{display:none}
+.file-label{display:block;background:var(--surf2);border:1.5px dashed rgba(88,166,255,0.4);border-radius:8px;padding:10px 16px;cursor:pointer;font-size:13px;color:var(--muted);transition:border-color .2s,background .2s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px}
+.file-label:hover{border-color:var(--accent);background:rgba(88,166,255,0.06)}
+.file-label.selected{border-color:var(--green);color:var(--green)}
+.btn-analyze{padding:10px 22px;background:linear-gradient(135deg,var(--accent),#3fb950);border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .2s;white-space:nowrap;flex-shrink:0}
+.btn-analyze:disabled{opacity:.45;cursor:not-allowed}
+.btn-analyze:hover:not(:disabled){opacity:.85}
+.progress-wrap{margin-top:18px;display:none}
+.progress-steps{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.step-chip{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;background:var(--surf2);border:1px solid var(--border);color:var(--muted);transition:all .3s}
+.step-chip.active{border-color:var(--accent);color:var(--accent);background:rgba(88,166,255,0.1)}
+.step-chip.done{border-color:var(--green);color:var(--green);background:rgba(63,185,80,0.1)}
+.step-chip.error{border-color:var(--red);color:var(--red);background:rgba(248,81,73,0.1)}
+.progress-bar-bg{height:4px;background:var(--surf2);border-radius:2px;overflow:hidden}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:2px;transition:width .5s ease;width:0}
+.prog-label{font-size:12px;color:var(--muted);margin-top:6px}
+.banner{border-radius:10px;padding:12px 18px;font-size:13px;margin-bottom:18px;display:none}
+.banner.show{display:block}
+.banner.error{background:rgba(248,81,73,.12);border:1px solid rgba(248,81,73,.3);color:var(--red)}
+.banner.success{background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.25);color:var(--green)}
+.results{display:none}
+.results.show{display:block}
+.summary-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:14px;margin-bottom:24px}
+.sum-card{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:18px;text-align:center;transition:transform .2s,border-color .2s}
+.sum-card:hover{transform:translateY(-2px);border-color:rgba(88,166,255,.4)}
+.sum-card .cat-label{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.sum-card .cat-score{font-size:34px;font-weight:900;margin-bottom:4px}
+.sum-card .cat-max{font-size:11px;color:var(--muted)}
+.sum-card .cat-name{font-size:12px;margin-top:6px}
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px}
+@media(max-width:700px){.charts-row{grid-template-columns:1fr}}
+.chart-card{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:22px}
+.chart-card h4{font-size:13px;color:var(--muted);font-weight:700;margin-bottom:14px}
+.cate-section{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px}
+.cate-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.cate-badge{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0}
+.cate-title{font-size:15px;font-weight:700;flex:1}
+.cate-score-pill{padding:3px 12px;border-radius:20px;font-size:13px;font-weight:700;border:1px solid}
+.cate-body{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.crit-card{background:var(--surf2);border:1px solid var(--border);border-radius:10px;padding:16px}
+.crit-name{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.3px}
+.crit-score{font-size:26px;font-weight:900;margin-bottom:6px}
+.crit-bar-bg{height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin-bottom:10px}
+.crit-bar-fill{height:100%;border-radius:3px;transition:width 1s ease}
+.crit-reason{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:6px}
+.crit-evidence{font-size:11px;color:rgba(230,237,243,.35);line-height:1.5;border-left:2px solid var(--border);padding-left:8px;word-break:break-all}
+.history-section{margin-top:28px}
+.history-section h3{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.history-table{width:100%;border-collapse:collapse;font-size:13px}
+.history-table th{text-align:left;color:var(--muted);padding:7px 10px;border-bottom:1px solid var(--border);font-weight:600}
+.history-table td{padding:9px 10px;border-bottom:1px solid var(--border)}
+.history-table tr:last-child td{border-bottom:none}
+.history-table tr:hover td{background:rgba(255,255,255,.02)}
+.btn-load{background:none;border:1px solid var(--border);border-radius:6px;color:var(--accent);font-size:12px;padding:3px 10px;cursor:pointer;transition:border-color .2s}
+.btn-load:hover{border-color:var(--accent)}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="brand-icon">🎓</div>AI 강의분석 리포트</div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <a href="/instructors" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(63,185,80,0.1);border:1px solid rgba(63,185,80,0.3);color:#3fb950;font-size:13px;font-weight:600;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(63,185,80,0.2)'" onmouseout="this.style.background='rgba(63,185,80,0.1)'">
+      👥 강사 대시보드
+    </a>
+    <a href="/comparison.html" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.3);color:#58a6ff;font-size:13px;font-weight:600;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(88,166,255,0.2)'" onmouseout="this.style.background='rgba(88,166,255,0.1)'">
+      📊 강사 비교
+    </a>
+    <a href="/logout" class="logout">로그아웃 →</a>
+  </div>
+</header>
+<main>
+  <!-- 메타데이터 CSV 업로드 패널 -->
+  <div class="upload-panel" id="metaPanel" style="margin-bottom:16px;padding:16px 22px">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:18px">📋</span>
+        <div>
+          <div style="font-size:14px;font-weight:600">강의 메타데이터 CSV</div>
+          <div id="metaStatus" style="font-size:12px;color:var(--muted)">로딩 중...</div>
+        </div>
+      </div>
+      <label style="display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:8px;background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.3);color:#58a6ff;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(88,166,255,0.2)'" onmouseout="this.style.background='rgba(88,166,255,0.1)'">
+        📂 CSV 업로드
+        <input type="file" accept=".csv" style="display:none" onchange="uploadMetaCSV(this)">
+      </label>
+    </div>
+  </div>
+
+  <div class="upload-panel">
+    <h2>📤 강의 분석 시작</h2>
+    <!-- 단일/일괄 탭 -->
+    <div style="display:flex;gap:4px;margin-bottom:16px">
+      <button id="tabSingle" onclick="switchTab('single')"
+        style="padding:6px 16px;border-radius:8px;border:1px solid var(--accent);background:rgba(88,166,255,.15);color:var(--accent);font-size:13px;font-weight:700;cursor:pointer">
+        단일 파일
+      </button>
+      <button id="tabBulk" onclick="switchTab('bulk')"
+        style="padding:6px 16px;border-radius:8px;border:0.5px solid var(--border);background:transparent;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer">
+        일괄 업로드
+      </button>
+    </div>
+
+    <!-- 단일 업로드 -->
+    <div id="panelSingle">
+      <div class="upload-row">
+        <div class="field" style="max-width:240px">
+          <label>강의 스크립트 (.txt)</label>
+          <input type="file" id="fileInput" accept=".txt">
+          <label class="file-label" for="fileInput" id="fileLabel">📄 파일 선택...</label>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn-analyze" id="analyzeBtn" disabled onclick="startAnalysis()">분석 시작</button>
+          <button id="cancelBtn" style="display:none;background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.3);border-radius:8px;padding:8px 18px;color:#f85149;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s" onclick="cancelAnalysis()">✕ 취소</button>
+        </div>
+      </div>
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-steps" style="margin-top:16px">
+          <div class="step-chip" id="step1">① 언어표현</div>
+          <div class="step-chip" id="step2">② 도입구조</div>
+          <div class="step-chip" id="step3">③ 개념전달</div>
+          <div class="step-chip" id="step4">④ 실습지도</div>
+          <div class="step-chip" id="step5">⑤ 상호작용</div>
+        </div>
+        <div class="progress-bar-bg" style="margin-top:10px"><div class="progress-bar-fill" id="progressBar"></div></div>
+        <div class="prog-label" id="progressLabel">분석 준비 중...</div>
+      </div>
+    </div>
+
+    <!-- 일괄 업로드 -->
+    <div id="panelBulk" style="display:none">
+      <div class="upload-row">
+        <div class="field">
+          <label>강의 스크립트 여러 개 선택 (.txt)</label>
+          <input type="file" id="bulkFileInput" accept=".txt" multiple onchange="onBulkFileChange()">
+          <label class="file-label" for="bulkFileInput" id="bulkFileLabel">📂 파일 여러 개 선택...</label>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn-analyze" id="bulkAnalyzeBtn" disabled onclick="startBulkAnalysis()">일괄 분석 시작</button>
+          <button id="bulkCancelBtn" style="display:none;background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.3);border-radius:8px;padding:8px 18px;color:#f85149;font-size:13px;font-weight:600;cursor:pointer" onclick="cancelBulkAnalysis()">✕ 취소</button>
+        </div>
+      </div>
+      <!-- 선택된 파일 목록 -->
+      <div id="bulkFileList" style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px"></div>
+      <!-- 진행 현황 -->
+      <div id="bulkProgress" style="display:none;margin-top:16px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px" id="bulkProgressLabel">준비 중...</div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="bulkProgressBar" style="width:0%"></div></div>
+        <div id="bulkLog" style="margin-top:10px;max-height:160px;overflow-y:auto;background:var(--surf2);border-radius:8px;padding:10px;font-size:12px;color:var(--muted)"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="banner error" id="errorBanner"></div>
+  <div class="banner success" id="successBanner"></div>
+
+  <div class="results" id="results">
+    <div class="summary-row" id="summaryRow"></div>
+    <div class="charts-row">
+      <div class="chart-card"><h4>📊 카테고리별 달성률 (레이더)</h4><canvas id="radarChart" height="240"></canvas></div>
+      <div class="chart-card"><h4>📈 세부 항목 점수</h4><canvas id="barChart" height="240"></canvas></div>
+    </div>
+    <div id="cateDetails"></div>
+  </div>
+
+  <div class="history-section" id="historySection" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+      <h3 style="margin:0">📋 분석 이력</h3>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span id="historyCount" style="font-size:12px;color:var(--muted)"></span>
+        <select id="historyPageSize" onchange="renderHistoryList(_historyFiltered)"
+          style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:12px;outline:none">
+          <option value="10" selected>10개씩</option>
+          <option value="20">20개씩</option>
+          <option value="50">50개씩</option>
+          <option value="0">전체</option>
+        </select>
+        <button id="historyPrevBtn" onclick="changeHistoryPage(-1)"
+          style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--muted);font-size:12px;cursor:pointer">◀</button>
+        <span id="historyPageLabel" style="font-size:12px;color:var(--muted);min-width:40px;text-align:center"></span>
+        <button id="historyNextBtn" onclick="changeHistoryPage(1)"
+          style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--muted);font-size:12px;cursor:pointer">▶</button>
+      </div>
+    </div>
+    <!-- 필터 -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center">
+      <input id="filterInstructor" type="text" placeholder="🔍 강사명" oninput="filterHistory()"
+        style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:13px;outline:none;width:130px">
+      <input id="filterCourse" type="text" placeholder="🔍 과목명" oninput="filterHistory()"
+        style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:13px;outline:none;width:130px">
+      <input id="filterDateFrom" type="date" oninput="filterHistory()"
+        style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:13px;outline:none">
+      <span style="font-size:12px;color:var(--muted)">~</span>
+      <input id="filterDateTo" type="date" oninput="filterHistory()"
+        style="background:var(--surf2);border:0.5px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:13px;outline:none">
+      <button onclick="clearFilter()" style="background:transparent;border:0.5px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--muted);font-size:12px;cursor:pointer">초기화</button>
+    </div>
+    <!-- 리스트 -->
+    <div id="historyList" style="display:flex;flex-direction:column;gap:6px"></div>
+  </div>
+</main>
+
+<script>
+const CATE_META = {
+  cate1:{label:'언어 표현 품질',  color:'#58a6ff'},
+  cate2:{label:'도입 및 구조',   color:'#3fb950'},
+  cate3:{label:'개념 전달 품질',  color:'#d29922'},
+  cate4:{label:'실습 지도 품질',  color:'#f0883e'},
+  cate5:{label:'수강생 상호작용', color:'#bc8cff'},
+};
+
+let selectedFile=null, radarChart=null, barChart=null;
+
+document.getElementById('fileInput').addEventListener('change', e=>{
+  const f=e.target.files[0];
+  if(!f)return;
+  if(!f.name.endsWith('.txt')){showBanner('error','.txt 파일만 가능합니다.');return;}
+  selectedFile=f;
+  const lbl=document.getElementById('fileLabel');
+  lbl.textContent=`✅ ${f.name} (${(f.size/1024).toFixed(1)} KB)`;
+  lbl.classList.add('selected');
+  const btn=document.getElementById('analyzeBtn');
+  btn.disabled=false; btn.textContent='🔍 분석 시작'; document.getElementById('cancelBtn').style.display='none'; window._currentAnalysisMeta=null;
+  hideBanners();
+});
+
+async function startAnalysis(force=false){
+  if(!selectedFile)return;
+
+  // 파일명에서 date, course_id 파싱
+  const stem  = selectedFile.name.replace(/\.txt$/, '');
+  const match = stem.match(/^(\d{4}-\d{2}-\d{2})_(.+)$/);
+  if(match && !force){
+    const [, date, course_id] = match;
+    try{
+      const check = await fetch(`/api/results?date=${date}&course_id=${encodeURIComponent(course_id)}&limit=1`);
+      const existing = await check.json();
+      if(existing.length > 0){
+        const ts = new Date(existing[0].timestamp).toLocaleString('ko-KR');
+        const ok = confirm(
+          `⚠️ 이미 분석된 강의입니다.
+
+` +
+          `📅 날짜: ${date}
+` +
+          `🏷 강의: ${course_id}
+` +
+          `🕐 분석 일시: ${ts}
+
+` +
+          `다시 분석하면 기존 데이터를 덮어씁니다.
+계속 진행하시겠습니까?`
+        );
+        if(!ok) return;
+      }
+    }catch(_){}
+  }
+
+  const btn=document.getElementById('analyzeBtn');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>분석 중...';
+  document.getElementById('cancelBtn').style.display='block';
+  hideBanners();
+  document.getElementById('progressWrap').style.display='block';
+  for(let i=1;i<=5;i++) document.getElementById('step'+i).className='step-chip';
+  document.getElementById('progressBar').style.width='0';
+  // 현재 분석 메타 저장 (취소용)
+  window._currentAnalysisMeta = { filename: selectedFile.name };
+
+  const fd=new FormData();
+  fd.append('file',selectedFile);
+  // gemini_key는 서버 .env에서 자동 로드
+
+  try{
+    const response=await fetch('/api/analyze',{method:'POST',body:fd});
+    const reader=response.body.getReader();
+    const decoder=new TextDecoder();
+    let buffer='';
+    while(true){
+      const{done,value}=await reader.read();
+      if(done)break;
+      buffer+=decoder.decode(value,{stream:true});
+      const lines=buffer.split('\n'); buffer=lines.pop();
+      for(const line of lines){
+        if(!line.startsWith('data: '))continue;
+        try{handleSSE(JSON.parse(line.slice(6)));}catch(_){}
+      }
+    }
+  }catch(err){showBanner('error','네트워크 오류: '+err.message);}
+  finally{btn.disabled=false;btn.textContent='🔍 분석 시작'; document.getElementById('cancelBtn').style.display='none'; window._currentAnalysisMeta=null;}
+}
+
+function handleSSE(msg){
+  if(msg.type==='progress'){
+    const pct=Math.round((msg.step-1)/msg.total*100);
+    document.getElementById('progressBar').style.width=pct+'%';
+    document.getElementById('progressLabel').textContent='분석 중: '+msg.label;
+    const chip=document.getElementById('step'+msg.step);
+    if(chip){chip.classList.remove('done','error');chip.classList.add('active');}
+    if(msg.step>1){const p=document.getElementById('step'+(msg.step-1));if(p){p.classList.remove('active');p.classList.add('done');}}
+  }else if(msg.type==='error'){
+    const chip=document.getElementById('step'+msg.step);
+    if(chip){chip.classList.remove('active');chip.classList.add('error');}
+  }else if(msg.type==='done'){
+    document.getElementById('progressBar').style.width='100%';
+    document.getElementById('progressLabel').textContent='✅ 분석 완료!';
+    for(let i=1;i<=5;i++){const c=document.getElementById('step'+i);if(c&&!c.classList.contains('error')){c.classList.remove('active');c.classList.add('done');}}
+    renderResults(msg.data);
+    showBanner('success','✅ "'+msg.data.filename+'" 분석 완료!');
+    loadHistory();
+  }
+}
+
+function scColor(ratio){
+  if(ratio>=0.8)return'#3fb950';
+  if(ratio>=0.6)return'#58a6ff';
+  if(ratio>=0.4)return'#d29922';
+  return'#f85149';
+}
+
+// ── 항목 ID → 카테고리 매핑 ──────────────────────────────────
+const ITEM_TO_CATE = {
+  '1.1':'cate1','1.2':'cate1','1.3':'cate1',
+  '2.1':'cate2','2.2':'cate2','2.3':'cate2','2.4':'cate2','2.5':'cate2',
+  '3.1':'cate3','3.2':'cate3','3.3':'cate3','3.4':'cate3',
+  '4.1':'cate4','4.2':'cate4','4.3':'cate4',
+  '5.1':'cate5','5.2':'cate5','5.3':'cate5',
+};
+const ITEM_NAMES = {
+  '1.1':'불필요한 반복 표현','1.2':'발화 완결성','1.3':'언어 일관성',
+  '2.1':'학습목표 안내','2.2':'전날 복습 연계','2.3':'설명 순서','2.4':'핵심내용 강조','2.5':'마무리 요약',
+  '3.1':'개념 정의','3.2':'비유 및 예시','3.3':'선행개념 확인','3.4':'발화속도 적절성',
+  '4.1':'예시 적절성','4.2':'실습 연계','4.3':'오류 대응',
+  '5.1':'이해 확인 질문','5.2':'참여 유도','5.3':'질문응답 충분성',
+};
+
+// cate4 구버전 숫자키 → 항목ID 변환 매핑
+const CATE4_NUM_TO_ID = {'1':'4.1','2':'4.2','3':'4.3'};
+const CATE_NUM_MAP = {
+  'cate1':{'1':'1.1','2':'1.2','3':'1.3'},
+  'cate2':{'1':'2.1','2':'2.2','3':'2.3','4':'2.4','5':'2.5'},
+  'cate3':{'1':'3.1','2':'3.2','3':'3.3','4':'3.4'},
+  'cate4':{'1':'4.1','2':'4.2','3':'4.3'},
+  'cate5':{'1':'5.1','2':'5.2','3':'5.3'},
+};
+
+// 구버전 한글키 항목을 통일 스키마로 변환
+function normalizeItem(raw){
+  if(!raw || typeof raw !== 'object') return null;
+  // 이미 통일 스키마면 그대로
+  if('score' in raw) return raw;
+  // 한글키 구버전 변환
+  const score = raw['점수'] ?? raw['score'] ?? 0;
+  const reason = raw['판정근거'] ?? raw['reason'] ?? '';
+  const evidence = raw['원문'] ? [{source: raw['원문'], timestamp:''}] : (raw['evidence']||[]);
+  const fb = raw['피드백'] || raw['feedback'] || {};
+  return {
+    score: parseFloat(score),
+    reason,
+    evidence,
+    feedback: {
+      weakness:   fb['개선_필요']  || fb['weakness']   || '',
+      suggestion: fb['추천_개선']  || fb['suggestion'] || '',
+      example:    fb['잘한_점']    || fb['example']    || '',
+    }
+  };
+}
+
+// categories 안의 각 cate에서 items를 꺼내 flat하게 병합
+function extractAllItems(categories){
+  const items = {};
+  for(const[cateKey, cateVal] of Object.entries(categories||{})){
+    const numMap = CATE_NUM_MAP[cateKey] || {};
+    // {items: {...}} 구조
+    const src = cateVal.items || cateVal || {};
+    for(const[itemId, itemVal] of Object.entries(src)){
+      if(typeof itemVal !== 'object' || itemVal === null) continue;
+      if(itemVal.error) continue;
+      // 숫자 키면 실제 항목ID로 변환
+      const realId = numMap[itemId] || itemId;
+      // ITEM_TO_CATE에 있는 키만 처리
+      if(ITEM_TO_CATE[realId]){
+        const normalized = normalizeItem(itemVal);
+        if(normalized) items[realId] = normalized;
+      }
+    }
+  }
+  return items;
+}
+
+// 카테고리별로 items 그룹핑
+function groupByCate(allItems){
+  const grouped = {};
+  for(const key of Object.keys(CATE_META)) grouped[key] = {};
+  for(const[itemId, itemVal] of Object.entries(allItems)){
+    const cKey = ITEM_TO_CATE[itemId];
+    if(cKey) grouped[cKey][itemId] = itemVal;
+  }
+  return grouped;
+}
+
+function cateAvgScore(itemsObj){
+  const vals = Object.values(itemsObj).map(v=>parseFloat(v.score??0)).filter(n=>!isNaN(n));
+  return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+}
+
+function renderResults(data){
+  document.getElementById('results').classList.add('show');
+  const cats = data.categories || {};
+  const allItems = extractAllItems(cats);
+  const grouped  = groupByCate(allItems);
+  renderSummary(grouped);
+  renderCharts(grouped, allItems);
+  renderDetails(grouped, cats);
+}
+
+function renderSummary(grouped){
+  const row=document.getElementById('summaryRow'); row.innerHTML='';
+  for(const[key,meta]of Object.entries(CATE_META)){
+    const score = cateAvgScore(grouped[key]);
+    const col = scColor(score/5);
+    row.innerHTML+=`<div class="sum-card">
+      <div class="cat-label">Cate ${key.slice(-1)}</div>
+      <div class="cat-score" style="color:${col}">${score.toFixed(2)}</div>
+      <div class="cat-max">/ 5.00</div>
+      <div class="cat-name">${meta.label}</div>
+    </div>`;
+  }
+}
+
+function renderCharts(grouped, allItems){
+  const catLabels = Object.values(CATE_META).map(m=>m.label);
+  const catScores = Object.entries(CATE_META).map(([key])=>Math.round(cateAvgScore(grouped[key])/5*100));
+  if(radarChart)radarChart.destroy();
+  radarChart=new Chart(document.getElementById('radarChart'),{
+    type:'radar',
+    data:{labels:catLabels,datasets:[{label:'달성률(%)',data:catScores,
+      backgroundColor:'rgba(88,166,255,0.15)',borderColor:'#58a6ff',
+      pointBackgroundColor:Object.values(CATE_META).map(m=>m.color),pointRadius:4,pointStyle:'circle',borderWidth:2}]},
+    options:{scales:{r:{min:0,max:100,ticks:{display:false},
+      grid:{color:'rgba(255,255,255,.07)'},angleLines:{color:'rgba(255,255,255,.07)'},pointLabels:{color:'#e6edf3',font:{size:11}}}},
+      plugins:{legend:{display:false}}}
+  });
+
+  const barLabels=[],barData=[],barColors=[];
+  for(const[key,meta]of Object.entries(CATE_META)){
+    for(const[itemId,itemVal]of Object.entries(grouped[key]||{})){
+      const s=parseFloat(itemVal.score??0);
+      barLabels.push(itemId);
+      barData.push(s); barColors.push(meta.color+'cc');
+    }
+  }
+  if(barChart)barChart.destroy();
+  barChart=new Chart(document.getElementById('barChart'),{
+    type:'bar',
+    data:{labels:barLabels,datasets:[{label:'점수',data:barData,backgroundColor:barColors,borderRadius:5}]},
+    options:{scales:{y:{min:0,max:5,ticks:{color:'rgba(255,255,255,.4)'},grid:{color:'rgba(255,255,255,.06)'}},
+      x:{ticks:{color:'#e6edf3',font:{size:10}},grid:{display:false}}},plugins:{legend:{display:false}}}
+  });
+}
+
+function renderDetails(grouped, cats){
+  const container=document.getElementById('cateDetails'); container.innerHTML='';
+  for(const[key,meta]of Object.entries(CATE_META)){
+    const items = grouped[key]||{};
+    const score = cateAvgScore(items);
+    const col = scColor(score/5);
+    let critHtml='';
+
+    for(const[itemId,itemVal]of Object.entries(items)){
+      const rawScore=parseFloat(itemVal.score??0);
+      const pct=Math.min(100,rawScore/5*100); const cCol=scColor(pct/100);
+      const reason=(itemVal.reason||itemVal['판정근거']||'').slice(0,150);
+      const fb=itemVal.feedback||{};
+      const weakness=fb.weakness||fb['잘한_점']||'';
+
+      // evidence 처리: [{source, timestamp}] 또는 문자열
+      let evidText='';
+      if(Array.isArray(itemVal.evidence)){
+        evidText=itemVal.evidence
+          .map(e=>typeof e==='string'?e:(e.source||'')).filter(Boolean).slice(0,2).join(' / ');
+      } else if(typeof itemVal.evidence==='string'){
+        evidText=itemVal.evidence;
+      } else if(itemVal['원문']){
+        evidText=itemVal['원문'];
+      }
+
+      const displayName = ITEM_NAMES[itemId]||itemId;
+      critHtml+=`<div class="crit-card">
+        <div class="crit-name">${itemId} ${displayName}</div>
+        <div class="crit-score" style="color:${cCol}">${rawScore.toFixed(1)}<span style="font-size:13px;color:var(--muted)">/5</span></div>
+        <div class="crit-bar-bg"><div class="crit-bar-fill" style="width:${pct}%;background:${cCol}"></div></div>
+        ${reason?`<div class="crit-reason">${reason}</div>`:''}
+        ${weakness&&weakness!=='해당 사항 없음'?`<div class="crit-reason" style="color:#d29922">⚠ ${weakness.slice(0,100)}</div>`:''}
+        ${evidText?`<div class="crit-evidence">"${evidText.slice(0,120)}"</div>`:''}
+      </div>`;
+    }
+
+    // cate에 error가 있으면 표시
+    const cateRaw = cats[key]||{};
+    if(cateRaw.error && !critHtml){
+      critHtml=`<div style="color:var(--red);font-size:13px">⚠ 분석 실패: ${cateRaw.error}</div>`;
+    }
+    if(!critHtml){
+      critHtml=`<div style="color:var(--muted);font-size:13px">세부 데이터 없음</div>`;
+    }
+
+    container.innerHTML+=`<div class="cate-section">
+      <div class="cate-header">
+        <div class="cate-badge" style="background:${meta.color}22;color:${meta.color};border:1px solid ${meta.color}44">${key.slice(-1)}</div>
+        <div class="cate-title">${meta.label}</div>
+        <div class="cate-score-pill" style="color:${col};border-color:${col}44;background:${col}15">${score.toFixed(2)} / 5.00</div>
+      </div>
+      <div class="cate-body">${critHtml}</div>
+    </div>`;
+  }
+}
+
+let _historyAll = [], _historyFiltered = [], _historyPage = 0;
+
+async function loadHistory(){
+  try{
+    const res  = await fetch('/api/history');
+    const list = await res.json();
+    if(!list.length) return;
+    _historyAll      = list;
+    _historyFiltered = list;
+    document.getElementById('historySection').style.display = 'block';
+    renderHistoryList(list);
+  }catch(_){}
+}
+
+function changeHistoryPage(dir){
+  const pageSize = parseInt(document.getElementById('historyPageSize').value);
+  if(pageSize === 0) return;
+  const totalPages = Math.ceil(_historyFiltered.length / pageSize);
+  _historyPage = Math.max(0, Math.min(_historyPage + dir, totalPages - 1));
+  renderHistoryList(_historyFiltered);
+}
+
+function renderHistoryList(list){
+  _historyFiltered = list;
+  const container  = document.getElementById('historyList');
+  container.innerHTML = '';
+
+  const pageSize   = parseInt(document.getElementById('historyPageSize')?.value || '10');
+  const totalPages = pageSize === 0 ? 1 : Math.ceil(list.length / pageSize);
+  _historyPage     = Math.max(0, Math.min(_historyPage, totalPages - 1));
+  const start      = pageSize === 0 ? 0 : _historyPage * pageSize;
+  const end        = pageSize === 0 ? list.length : start + pageSize;
+  const paginated  = list.slice(start, end);
+
+  // 카운트/페이지 UI 업데이트
+  document.getElementById('historyCount').textContent = `총 ${list.length}건`;
+  const pageEl  = document.getElementById('historyPageLabel');
+  const prevBtn = document.getElementById('historyPrevBtn');
+  const nextBtn = document.getElementById('historyNextBtn');
+  if(pageEl)  pageEl.textContent  = pageSize === 0 ? '' : `${_historyPage+1} / ${totalPages}`;
+  if(prevBtn) prevBtn.style.opacity = (_historyPage === 0 || pageSize === 0) ? '0.3' : '1';
+  if(nextBtn) nextBtn.style.opacity = (_historyPage >= totalPages-1 || pageSize === 0) ? '0.3' : '1';
+
+  if(!paginated.length){
+    container.innerHTML = '<div style="text-align:center;padding:28px;color:var(--muted);font-size:13px">검색 결과가 없습니다</div>';
+    return;
+  }
+
+  paginated.forEach(item=>{
+    const instructor = item.instructor || '미확인';
+    const date       = item.date       || item.timestamp?.slice(0,10) || '-';
+    const courseId   = item.course_id  || '-';
+    const ts         = new Date(item.timestamp).toLocaleString('ko-KR');
+
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surf2);border:0.5px solid var(--border);border-radius:10px;padding:12px 16px;transition:border-color .2s;flex-wrap:wrap';
+    row.onmouseover = ()=>row.style.borderColor='var(--accent)';
+    row.onmouseout  = ()=>row.style.borderColor='var(--border)';
+
+    row.innerHTML = `
+      <div style="display:flex;align-items:center;gap:14px;flex:1;min-width:0">
+        <div style="width:38px;height:38px;border-radius:50%;background:rgba(88,166,255,.12);border:1.5px solid rgba(88,166,255,.3);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#58a6ff;flex-shrink:0">
+          ${instructor !== '미확인' ? instructor[0] : '?'}
+        </div>
+        <div style="min-width:0">
+          <div style="font-size:14px;font-weight:600;margin-bottom:2px">${instructor} 강사</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <span style="font-size:12px;color:var(--muted)">📅 ${date}</span>
+            <span style="font-size:12px;color:var(--muted)">🏷 ${courseId}</span>
+            <span style="font-size:11px;color:rgba(230,237,243,.3)">${ts}</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button class="btn-load" onclick="loadResult(encodeURIComponent('${item.resultFile}'))">불러오기</button>
+        <button onclick="deleteResult('${item.resultFile}')"
+          style="background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.2);border-radius:8px;padding:7px 12px;color:#f85149;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s"
+          onmouseover="this.style.background='rgba(248,81,73,.18)'"
+          onmouseout="this.style.background='rgba(248,81,73,.08)'">삭제</button>
+      </div>`;
+    container.appendChild(row);
+  });
+}
+
+async function cancelAnalysis(){
+  const meta = window._currentAnalysisMeta;
+  if(!meta) return;
+
+  const ok = confirm('분석을 취소하시겠습니까?\n취소하면 진행 중인 분석이 중단되고 부분 저장된 데이터가 삭제됩니다.');
+  if(!ok) return;
+
+  // 파일명에서 date, course_id 파싱
+  const stem  = meta.filename.replace(/\.txt$/, '');
+  const match = stem.match(/^(\d{4}-\d{2}-\d{2})_(.+)$/);
+  if(!match){ showBanner('error','파일명에서 강의 정보를 파싱할 수 없습니다.'); return; }
+
+  const [, date, course_id] = match;
+  try{
+    const res  = await fetch('/api/analyze/cancel', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ date, course_id })
+    });
+    const data = await res.json();
+    if(data.ok){
+      showBanner('success', `✅ 분석이 취소되었습니다. (${data.deleted}개 데이터 삭제)`);
+    }
+  }catch(e){
+    showBanner('error', '취소 오류: ' + e.message);
+  }
+
+  // UI 초기화
+  const btn = document.getElementById('analyzeBtn');
+  btn.disabled = false; btn.innerHTML = '분석 시작';
+  document.getElementById('cancelBtn').style.display = 'none';
+  document.getElementById('progressWrap').style.display = 'none';
+  window._currentAnalysisMeta = null;
+}
+
+async function deleteResult(resultFile){
+  const ok = confirm('이 분석 결과를 삭제하시겠습니까?\n\n삭제하면 복구할 수 없습니다.');
+  if(!ok) return;
+  try{
+    const key = encodeURIComponent(resultFile);
+    const res = await fetch('/api/result/' + key, { method: 'DELETE' });
+    const data = await res.json();
+    if(data.ok){
+      showBanner('success', '✅ 삭제되었습니다.');
+      loadHistory(); // 목록 갱신
+    } else {
+      showBanner('error', '삭제 실패: ' + (data.error||''));
+    }
+  }catch(e){
+    showBanner('error', '오류: ' + e.message);
+  }
+}
+
+function filterHistory(){
+  const instrQ  = document.getElementById('filterInstructor').value.trim().toLowerCase();
+  const courseQ = document.getElementById('filterCourse').value.trim().toLowerCase();
+  const dateFrom= document.getElementById('filterDateFrom').value;
+  const dateTo  = document.getElementById('filterDateTo').value;
+  const filtered = _historyAll.filter(item=>{
+    const date = item.date || item.timestamp?.slice(0,10) || '';
+    if(instrQ  && !(item.instructor||'').toLowerCase().includes(instrQ)) return false;
+    if(courseQ && !(item.course_id||'').toLowerCase().includes(courseQ)) return false;
+    if(dateFrom && date < dateFrom) return false;
+    if(dateTo   && date > dateTo)   return false;
+    return true;
+  });
+  _historyPage = 0;
+  renderHistoryList(filtered);
+}
+
+function clearFilter(){
+  document.getElementById('filterInstructor').value = '';
+  document.getElementById('filterCourse').value     = '';
+  document.getElementById('filterDateFrom').value   = '';
+  document.getElementById('filterDateTo').value     = '';
+  _historyPage = 0;
+  renderHistoryList(_historyAll);
+}
+
+// ── 탭 전환 ────────────────────────────────────────────────
+function switchTab(tab){
+  const isSingle = tab === 'single';
+  document.getElementById('panelSingle').style.display = isSingle ? '' : 'none';
+  document.getElementById('panelBulk').style.display   = isSingle ? 'none' : '';
+  document.getElementById('tabSingle').style.background = isSingle ? 'rgba(88,166,255,.15)' : 'transparent';
+  document.getElementById('tabSingle').style.color      = isSingle ? 'var(--accent)' : 'var(--muted)';
+  document.getElementById('tabSingle').style.border     = isSingle ? '1px solid var(--accent)' : '0.5px solid var(--border)';
+  document.getElementById('tabBulk').style.background   = isSingle ? 'transparent' : 'rgba(88,166,255,.15)';
+  document.getElementById('tabBulk').style.color        = isSingle ? 'var(--muted)' : 'var(--accent)';
+  document.getElementById('tabBulk').style.border       = isSingle ? '0.5px solid var(--border)' : '1px solid var(--accent)';
+}
+
+// ── 일괄 업로드 ─────────────────────────────────────────────
+let _bulkAbort = false;
+
+function onBulkFileChange(){
+  const files = document.getElementById('bulkFileInput').files;
+  document.getElementById('bulkAnalyzeBtn').disabled = !files.length;
+  document.getElementById('bulkFileLabel').textContent = files.length ? `📂 ${files.length}개 선택됨` : '📂 파일 여러 개 선택...';
+  const list = document.getElementById('bulkFileList');
+  list.innerHTML = [...files].map(f=>`<span style="background:var(--surf2);border:0.5px solid var(--border);border-radius:6px;padding:3px 8px;font-size:11px;color:var(--muted)">${f.name}</span>`).join('');
+}
+
+async function startBulkAnalysis(){
+  const input = document.getElementById('bulkFileInput');
+  if(!input.files.length) return;
+  _bulkAbort = false;
+  document.getElementById('bulkAnalyzeBtn').disabled = true;
+  document.getElementById('bulkCancelBtn').style.display = '';
+  document.getElementById('bulkProgress').style.display = '';
+  const log = document.getElementById('bulkLog');
+  log.innerHTML = '';
+
+  const fd = new FormData();
+  [...input.files].forEach(f => fd.append('files', f));
+
+  const response = await fetch('/api/analyze/bulk', { method:'POST', body: fd });
+  const reader   = response.body.getReader();
+  const decoder  = new TextDecoder();
+  let buf = '';
+
+  while(true){
+    const { done, value } = await reader.read();
+    if(done || _bulkAbort) break;
+    buf += decoder.decode(value, { stream: true });
+    const lines = buf.split('\n');
+    buf = lines.pop();
+    for(const line of lines){
+      if(!line.startsWith('data:')) continue;
+      try{
+        const ev = JSON.parse(line.slice(5));
+        if(ev.type === 'bulk_start'){
+          document.getElementById('bulkProgressLabel').textContent = `총 ${ev.total}개 파일 분석 시작`;
+        } else if(ev.type === 'file_start'){
+          document.getElementById('bulkProgressLabel').textContent = `[${ev.index}/${ev.total}] ${ev.filename} 분석 중...`;
+          document.getElementById('bulkProgressBar').style.width = ((ev.index-1)/ev.total*100)+'%';
+        } else if(ev.type === 'progress'){
+          log.innerHTML += `<div>  └ [${ev.fileIndex}/${ev.total}] ${ev.filename} — ${ev.label}</div>`;
+          log.scrollTop = log.scrollHeight;
+        } else if(ev.type === 'file_done'){
+          document.getElementById('bulkProgressBar').style.width = (ev.index/ev.total*100)+'%';
+          log.innerHTML += `<div style="color:var(--green)">✅ ${ev.filename} 완료 (${ev.instructor||'강사미확인'} / ${ev.date})</div>`;
+          log.scrollTop = log.scrollHeight;
+        } else if(ev.type === 'bulk_done'){
+          document.getElementById('bulkProgressLabel').textContent = `✅ 전체 ${ev.total}개 파일 분석 완료!`;
+          document.getElementById('bulkProgressBar').style.width = '100%';
+          document.getElementById('bulkCancelBtn').style.display = 'none';
+          document.getElementById('bulkAnalyzeBtn').disabled = false;
+          loadHistory();
+        }
+      } catch(_){}
+    }
+  }
+}
+
+function cancelBulkAnalysis(){
+  _bulkAbort = true;
+  document.getElementById('bulkCancelBtn').style.display = 'none';
+  document.getElementById('bulkAnalyzeBtn').disabled = false;
+  document.getElementById('bulkProgressLabel').textContent = '취소됨';
+}
+
+async function loadResult(filename){
+  try{
+    const res=await fetch('/api/result/'+filename); const data=await res.json();
+    renderResults(data); showBanner('success','📂 "'+data.filename+'" 결과 불러옴');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }catch(err){showBanner('error','불러오기 오류: '+err.message);}
+}
+
+function showBanner(type,msg){
+  hideBanners();
+  const el=document.getElementById(type+'Banner');
+  el.textContent=msg; el.classList.add('show');
+  if(type==='success')setTimeout(()=>el.classList.remove('show'),6000);
+}
+function hideBanners(){['errorBanner','successBanner'].forEach(id=>document.getElementById(id).classList.remove('show'));}
+loadHistory();
+// ── 메타데이터 CSV 상태 확인 ─────────────────────────────────
+async function checkMetaStatus() {
+  try {
+    const res = await fetch('/api/meta/status');
+    const ct  = res.headers.get('content-type') || '';
+    if (!ct.includes('application/json')) return; // HTML 응답(로그인 리다이렉트) 무시
+    const data = await res.json();
+    const el   = document.getElementById('metaStatus');
+    if (data.loaded) {
+      el.style.color = '#3fb950';
+      el.textContent = `✅ ${data.count}개 강의 매핑 로드됨 — 강의자 자동 인식 활성`;
+    } else {
+      el.style.color = '#d29922';
+      el.textContent = '⚠️ CSV 미로드 — CSV를 업로드하거나 서버 루트에 강의_메타데이터.csv를 놓으세요';
+    }
+  } catch(e) {
+    // 네트워크 오류 등은 무시
+  }
+}
+
+// ── 메타데이터 CSV 업로드 ─────────────────────────────────────
+async function uploadMetaCSV(input) {
+  if (!input.files[0]) return;
+  const el = document.getElementById('metaStatus');
+  el.style.color = 'var(--muted)';
+  el.textContent = '⏳ 업로드 중...';
+
+  const fd = new FormData();
+  fd.append('csv', input.files[0]);
+
+  try {
+    const res = await fetch('/api/meta/upload', { method: 'POST', body: fd });
+    const ct  = res.headers.get('content-type') || '';
+    if (!ct.includes('application/json')) {
+      el.style.color = '#f85149';
+      el.textContent = '❌ 세션이 만료됐습니다. 페이지를 새로고침 후 다시 로그인하세요.';
+      return;
+    }
+    const data = await res.json();
+    if (data.ok) {
+      el.style.color = '#3fb950';
+      el.textContent = `✅ ${data.count}개 강의 매핑 로드됨 — 강의자 자동 인식 활성`;
+    } else {
+      el.style.color = '#f85149';
+      el.textContent = '❌ 업로드 실패: ' + (data.error || '알 수 없는 오류');
+    }
+  } catch(e) {
+    el.style.color = '#f85149';
+    el.textContent = '❌ 오류: ' + e.message;
+  }
+  input.value = '';
+}
+
+// 페이지 로드 시 메타 상태 확인
+checkMetaStatus();
+</script>
+</body>
+</html>
