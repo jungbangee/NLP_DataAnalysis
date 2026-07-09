@@ -1,0 +1,171 @@
+{
+  "timestamp": "2026-06-17T01:58:19.463Z",
+  "filename": "2026-02-02_kdt-backendj-21th.txt",
+  "categories": {
+    "cate1": {
+      "category": "1",
+      "category_name": "언어 표현 품질",
+      "score": 2.42,
+      "max_score": 2.75,
+      "criteria": {
+        "불필요한_반복_표현": {
+          "rubric_score": 4.85,
+          "weighted_score": 0.97,
+          "evidence": [
+            "감지된 사례 없음"
+          ],
+          "reason": "페널티 0건 / 1484건. 규칙 기반 (오류: HTTP Error 404: Not Found)",
+          "filler_word_counts": {
+            "이제": 137,
+            "그냥": 107,
+            "뭐": 110,
+            "그러니까": 31,
+            "사실": 10,
+            "어": 7,
+            "그리고": 57
+          }
+        },
+        "발화_완결성": {
+          "rubric_score": 5,
+          "weighted_score": 1,
+          "evidence": [
+            "지난 시간에 제너릭 타입을 이용을 해서 커스텀 컬렉션을 활용한 크루드 방법을 학습 이해를 하고 그다음에 데이터 흐름 읽기 쓰기를 구현하는 날이에요. 자바는",
+            "오후에는 효울씨 입실하기 전에 데이터베이스 설치하고 그 다음 오늘은 마무리하도록 조금 화면 전환 좀 할게요 일단은"
+          ],
+          "reason": "미완결 234건. 규칙 기반 (오류: HTTP Error 404: Not Found)"
+        },
+        "언어_일관성": {
+          "rubric_score": 3,
+          "weighted_score": 0.45,
+          "evidence": [
+            "[어체혼용] 얘를 직렬화를 시키려고 그러면 여기 시리얼라이저블 인터페이스를 구현을 해야 됩니다.",
+            "[어체혼용] 얘를 살짝 가지고 와서 얘를 쓴다는 거지 이렇게 붙이고 얘를 붙여 나 문자열로 리턴하겠어 그럼 얘가 사이즈가 가지고 있는 얘죠"
+          ],
+          "reason": "혼용 6건, 일관성 70점. 규칙 기반 (오류: HTTP Error 404: Not Found)"
+        }
+      }
+    },
+    "cate2": {
+      "category": "2",
+      "category_name": "강의 도입 및 구조",
+      "score": 0,
+      "max_score": 5,
+      "criteria": {
+        "학습목표 안내": {
+          "id": "2.1",
+          "score": 0,
+          "weight": 3,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 404: Not Found"
+        },
+        "전날 복습 연계": {
+          "id": "2.2",
+          "score": 0,
+          "weight": 3,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 404: Not Found"
+        },
+        "설명 순서": {
+          "id": "2.3",
+          "score": 0,
+          "weight": 2,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 404: Not Found"
+        },
+        "핵심내용 강조": {
+          "id": "2.4",
+          "score": 0,
+          "weight": 2,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 404: Not Found"
+        },
+        "마무리 요약": {
+          "id": "2.5",
+          "score": 0,
+          "weight": 1,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 404: Not Found"
+        }
+      }
+    },
+    "cate3": {
+      "category": "3",
+      "category_name": "개념 전달 품질",
+      "score": 10,
+      "max_score": 20,
+      "criteria": {
+        "concept_definition": {
+          "score": 3,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 404: Not Found",
+          "checks": {}
+        },
+        "example_usage": {
+          "score": 3,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 404: Not Found",
+          "checks": {}
+        },
+        "prerequisite_check": {
+          "score": 3,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 404: Not Found",
+          "checks": {}
+        },
+        "speech_speed": {
+          "score": 1,
+          "evidence": {
+            "epm": 20449,
+            "cpm": 58030,
+            "label": "극단적으로 빠름"
+          },
+          "reason": "발화 속도 58030음절/분 (극단적으로 빠름). 강의 적정 범위: 250~350음절/분."
+        }
+      }
+    },
+    "cate4": {
+      "category": "4",
+      "category_name": "실습 지도 품질",
+      "score": 0,
+      "max_score": 15,
+      "error": "HTTP Error 404: Not Found",
+      "criteria": {}
+    },
+    "cate5": {
+      "category": "5",
+      "category_name": "수강생 상호작용",
+      "score": 0.937,
+      "max_score": 2.25,
+      "criteria": {
+        "이해_확인_질문": {
+          "rubric_score": 1.9,
+          "weighted_score": 0.38,
+          "evidence": [
+            "같은 타입의 변수에 저장하고 마이너 1인지 확인해서 비교할 때 여기가 인트여야 해 그래야 여기를 인트로 바꿔주는 맞죠. 아까",
+            "그래서 여기 보면 뉴 버퍼드 리더라이터로 버퍼드 스트림에 있는 애들은 얘로 가져고 오면 되는 것까지는 이해했어.",
+            "만들어 놨으니 했으면 좋겠어 이런 거지 알겠어요."
+          ],
+          "reason": "확인질문 4회 (0.3%), 전반 2회 / 후반 2회. 규칙 기반 (오류: HTTP Error 404: Not Found)"
+        },
+        "참여_유도": {
+          "rubric_score": 1.71,
+          "weighted_score": 0.257,
+          "evidence": [
+            "여러분 오늘 수업 진행하도록 하겠습니다. 저희가 이제 오늘 1차 잡바 마지막 날입니다. 그래서",
+            "여기 API가 20일 현재 20일 API 보는 부분 여기 클릭 한번 해볼까요?",
+            "저희가 수업 시간에 했던 여기 리버시드라고 하는 것도 볼 수가 있습니습니다. 지금은 여러분들이"
+          ],
+          "reason": "유도발화 36회 (2.4%), 학생발화 0.0%. 규칙 기반 (오류: HTTP Error 404: Not Found)"
+        },
+        "질문_응답_충분성": {
+          "rubric_score": 3,
+          "weighted_score": 0.3,
+          "evidence": [
+            "학생 질문 없음"
+          ],
+          "reason": "응답률 100.0%, 미응답 0건, 미흡 0건. 질문 없음 (오류: HTTP Error 404: Not Found)"
+        }
+      }
+    }
+  }
+}

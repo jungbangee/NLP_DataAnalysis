@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-06-17T01:47:52.192Z",
+  "filename": "2026-02-02_kdt-backendj-21th.txt",
+  "categories": {
+    "cate1": {
+      "error": "cate1.py 실패 (exit 2): python: can't open file 'C:\\\\Users\\\\buffa\\\\NLP_Task_AI_Report\\\\python\\\\cate1.py': [Errno 2] No such file or directory\r\n"
+    },
+    "cate2": {
+      "error": "cate2.py 실패 (exit 2): python: can't open file 'C:\\\\Users\\\\buffa\\\\NLP_Task_AI_Report\\\\python\\\\cate2.py': [Errno 2] No such file or directory\r\n"
+    },
+    "cate3": {
+      "error": "cate3.py 실패 (exit 2): python: can't open file 'C:\\\\Users\\\\buffa\\\\NLP_Task_AI_Report\\\\python\\\\cate3.py': [Errno 2] No such file or directory\r\n"
+    },
+    "cate4": {
+      "error": "cate4.py 실패 (exit 2): python: can't open file 'C:\\\\Users\\\\buffa\\\\NLP_Task_AI_Report\\\\python\\\\cate4.py': [Errno 2] No such file or directory\r\n"
+    },
+    "cate5": {
+      "error": "cate5.py 실패 (exit 2): python: can't open file 'C:\\\\Users\\\\buffa\\\\NLP_Task_AI_Report\\\\python\\\\cate5.py': [Errno 2] No such file or directory\r\n"
+    }
+  }
+}

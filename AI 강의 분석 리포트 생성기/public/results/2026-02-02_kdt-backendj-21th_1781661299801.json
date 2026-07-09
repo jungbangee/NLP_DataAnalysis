@@ -1,0 +1,170 @@
+{
+  "timestamp": "2026-06-17T01:54:31.607Z",
+  "filename": "2026-02-02_kdt-backendj-21th.txt",
+  "categories": {
+    "cate1": {
+      "category": "1",
+      "category_name": "��� ǥ�� ǰ��",
+      "score": 2.42,
+      "max_score": 2.75,
+      "criteria": {
+        "���ʿ���_�ݺ�_ǥ��": {
+          "rubric_score": 4.85,
+          "weighted_score": 0.97,
+          "evidence": [
+            "������ ��� ����"
+          ],
+          "reason": "���Ƽ 0�� / 1484��. ��Ģ ��� (����: HTTP Error 404: Not Found)",
+          "filler_word_counts": {
+            "����": 137,
+            "�׳�": 107,
+            "��": 7,
+            "�׷��ϱ�": 31,
+            "���": 10,
+            "�׸���": 57
+          }
+        },
+        "��ȭ_�ϰἺ": {
+          "rubric_score": 5,
+          "weighted_score": 1,
+          "evidence": [
+            "���� �ð��� ���ʸ� Ÿ���� �̿��� �ؼ� Ŀ���� �÷����� Ȱ���� ũ��� ����� �н� ���ظ� �ϰ� �״����� ������ �帧 �б� ���⸦ �����ϴ� ���̿���. �ڹٴ�",
+            "���Ŀ��� ȿ�ﾾ �Խ��ϱ� ���� �����ͺ��̽� ��ġ�ϰ� �� ���� ������ �������ϵ��� ���� ȭ�� ��ȯ �� �ҰԿ� �ϴ���"
+          ],
+          "reason": "�̿ϰ� 234��. ��Ģ ��� (����: Expecting ',' delimiter: line 5 column 81 (char 168))"
+        },
+        "���_�ϰ���": {
+          "rubric_score": 3,
+          "weighted_score": 0.45,
+          "evidence": [
+            "[��üȥ��] �긦 ����ȭ�� ��Ű���� �׷��� ���� �ø���������� �������̽��� ������ �ؾ� �˴ϴ�.",
+            "[��üȥ��] �긦 ��¦ ������ �ͼ� �긦 ���ٴ� ���� �̷��� ���̰� �긦 �ٿ� �� ���ڿ��� �����ϰھ� �׷� �갡 ����� ������ �ִ� ����"
+          ],
+          "reason": "ȥ�� 6��, �ϰ��� 70��. ��Ģ ��� (����: HTTP Error 404: Not Found)"
+        }
+      }
+    },
+    "cate2": {
+      "category": "2",
+      "category_name": "���� ���� �� ����",
+      "score": 0,
+      "max_score": 5,
+      "criteria": {
+        "�н���ǥ �ȳ�": {
+          "id": "2.1",
+          "score": 0,
+          "weight": 3,
+          "evidence": "",
+          "reason": "�м� ����: HTTP Error 404: Not Found"
+        },
+        "���� ���� ����": {
+          "id": "2.2",
+          "score": 0,
+          "weight": 3,
+          "evidence": "",
+          "reason": "�м� ����: HTTP Error 404: Not Found"
+        },
+        "���� ����": {
+          "id": "2.3",
+          "score": 0,
+          "weight": 2,
+          "evidence": "",
+          "reason": "�м� ����: HTTP Error 404: Not Found"
+        },
+        "�ٽɳ��� ����": {
+          "id": "2.4",
+          "score": 0,
+          "weight": 2,
+          "evidence": "",
+          "reason": "�м� ����: HTTP Error 404: Not Found"
+        },
+        "������ ���": {
+          "id": "2.5",
+          "score": 0,
+          "weight": 1,
+          "evidence": "",
+          "reason": "�м� ����: HTTP Error 404: Not Found"
+        }
+      }
+    },
+    "cate3": {
+      "category": "3",
+      "category_name": "���� ���� ǰ��",
+      "score": 10,
+      "max_score": 20,
+      "criteria": {
+        "concept_definition": {
+          "score": 3,
+          "evidence": "",
+          "reason": "�м� ����: HTTP Error 404: Not Found",
+          "checks": {}
+        },
+        "example_usage": {
+          "score": 3,
+          "evidence": "",
+          "reason": "�м� ����: HTTP Error 404: Not Found",
+          "checks": {}
+        },
+        "prerequisite_check": {
+          "score": 3,
+          "evidence": "",
+          "reason": "�м� ����: HTTP Error 404: Not Found",
+          "checks": {}
+        },
+        "speech_speed": {
+          "score": 1,
+          "evidence": {
+            "epm": 20449,
+            "cpm": 58030,
+            "label": "�ش������� ����"
+          },
+          "reason": "��ȭ �ӵ� 58030����/�� (�ش������� ����). ���� ���� ����: 250~350����/��."
+        }
+      }
+    },
+    "cate4": {
+      "category": "4",
+      "category_name": "�ǽ� ���� ǰ��",
+      "score": 0,
+      "max_score": 15,
+      "error": "HTTP Error 404: Not Found",
+      "criteria": {}
+    },
+    "cate5": {
+      "category": "5",
+      "category_name": "������ ��ȣ�ۿ�",
+      "score": 0.937,
+      "max_score": 2.25,
+      "criteria": {
+        "����_Ȯ��_����": {
+          "rubric_score": 1.9,
+          "weighted_score": 0.38,
+          "evidence": [
+            "���� Ÿ���� ������ �����ϰ� ���̳� 1���� Ȯ���ؼ� ���� �� ���Ⱑ ��Ʈ���� �� �׷��� ���⸦ ��Ʈ�� �ٲ��ִ� ����. �Ʊ�",
+            "�׷��� ���� ���� �� ���۵� ���������ͷ� ���۵� ��Ʈ���� �ִ� �ֵ��� ��� ������ ���� �Ǵ� �ͱ����� �����߾�.",
+            "����� ������ ������ ���ھ� �̷� ���� �˰ھ��."
+          ],
+          "reason": "Ȯ������ 4ȸ (0.3%), ���� 2ȸ / �Ĺ� 2ȸ. ��Ģ ��� (����: HTTP Error 404: Not Found)"
+        },
+        "����_����": {
+          "rubric_score": 1.71,
+          "weighted_score": 0.257,
+          "evidence": [
+            "������ ���� ���� �����ϵ��� �ϰڽ��ϴ�. ���� ���� ���� 1�� ��� ������ ���Դϴ�. �׷���",
+            "���� API�� 20�� ���� 20�� API ���� �κ� ���� Ŭ�� �ѹ� �غ����?",
+            "���� ���� �ð��� �ߴ� ���� �����õ��� �ϴ� �͵� �� ���� �ֽ��Ͻ��ϴ�. ������ �����е���"
+          ],
+          "reason": "������ȭ 36ȸ (2.4%), �л���ȭ 0.0%. ��Ģ ��� (����: HTTP Error 404: Not Found)"
+        },
+        "����_����_��м�": {
+          "rubric_score": 3,
+          "weighted_score": 0.3,
+          "evidence": [
+            "�л� ���� ����"
+          ],
+          "reason": "����� 100.0%, ������ 0��, ���� 0��. ���� ���� (����: Expecting property name enclosed in double quotes: line 7 column 31 (char 160))"
+        }
+      }
+    }
+  }
+}

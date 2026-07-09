@@ -1,0 +1,169 @@
+{
+  "timestamp": "2026-06-18T00:55:20.044Z",
+  "filename": "2026-02-13_kdt-backendj-21th.txt",
+  "categories": {
+    "cate1": {
+      "category": "1",
+      "category_name": "언어 표현 품질",
+      "score": 2.722,
+      "max_score": 2.75,
+      "criteria": {
+        "불필요한_반복_표현": {
+          "rubric_score": 4.86,
+          "weighted_score": 0.972,
+          "evidence": [
+            "감지된 사례 없음"
+          ],
+          "reason": "페널티 0건 / 1539건. 규칙 기반 (오류: HTTP Error 400: Bad Request)",
+          "filler_word_counts": {
+            "이제": 195,
+            "그냥": 45,
+            "뭐": 92,
+            "그러니까": 16,
+            "사실": 9,
+            "어": 6,
+            "그리고": 67
+          }
+        },
+        "발화_완결성": {
+          "rubric_score": 5,
+          "weighted_score": 1,
+          "evidence": [
+            "저희 이제 오늘은 13일 수업이고 그 다음에 오늘 수업 끝나면 이제 연휴라서 오늘 좀 행복하게 수업 진행해 보도록 할 저희 어제는 그 마이에스큐L이 가지고 있는",
+            "저희가 사용할 수 있는 모든 스키마 유저 스키마죠 유저 스키마는 인포메이션 스키마로 일단은 값을 전달하는 이 두 가지 스키마를 핵심적으로"
+          ],
+          "reason": "미완결 250건. 규칙 기반 (오류: HTTP Error 400: Bad Request)"
+        },
+        "언어_일관성": {
+          "rubric_score": 5,
+          "weighted_score": 0.75,
+          "evidence": [
+            "감지된 사례 없음"
+          ],
+          "reason": "혼용 0건, 일관성 100점. 규칙 기반 (오류: HTTP Error 400: Bad Request)"
+        }
+      }
+    },
+    "cate2": {
+      "category": "2",
+      "category_name": "강의 도입 및 구조",
+      "score": 0,
+      "max_score": 5,
+      "criteria": {
+        "학습목표 안내": {
+          "id": "2.1",
+          "score": 0,
+          "weight": 3,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 400: Bad Request"
+        },
+        "전날 복습 연계": {
+          "id": "2.2",
+          "score": 0,
+          "weight": 3,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 400: Bad Request"
+        },
+        "설명 순서": {
+          "id": "2.3",
+          "score": 0,
+          "weight": 2,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 400: Bad Request"
+        },
+        "핵심내용 강조": {
+          "id": "2.4",
+          "score": 0,
+          "weight": 2,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 400: Bad Request"
+        },
+        "마무리 요약": {
+          "id": "2.5",
+          "score": 0,
+          "weight": 1,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 400: Bad Request"
+        }
+      }
+    },
+    "cate3": {
+      "category": "3",
+      "category_name": "개념 전달 품질",
+      "score": 10,
+      "max_score": 20,
+      "criteria": {
+        "concept_definition": {
+          "score": 3,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 400: Bad Request",
+          "checks": {}
+        },
+        "example_usage": {
+          "score": 3,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 400: Bad Request",
+          "checks": {}
+        },
+        "prerequisite_check": {
+          "score": 3,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 400: Bad Request",
+          "checks": {}
+        },
+        "speech_speed": {
+          "score": 1,
+          "evidence": {
+            "epm": 20667,
+            "cpm": 58309,
+            "label": "극단적으로 빠름"
+          },
+          "reason": "발화 속도 58309음절/분 (극단적으로 빠름). 강의 적정 범위: 250~350음절/분."
+        }
+      }
+    },
+    "cate4": {
+      "category": "4",
+      "category_name": "실습 지도 품질",
+      "score": 0,
+      "max_score": 15,
+      "error": "HTTP Error 400: Bad Request",
+      "criteria": {}
+    },
+    "cate5": {
+      "category": "5",
+      "category_name": "수강생 상호작용",
+      "score": 0.952,
+      "max_score": 2.25,
+      "criteria": {
+        "이해_확인_질문": {
+          "rubric_score": 1.97,
+          "weighted_score": 0.394,
+          "evidence": [
+            "맞죠.",
+            "트랜잭션 스타트한 시간 맞죠. 그죠"
+          ],
+          "reason": "확인질문 2회 (0.1%), 전반 1회 / 후반 1회. 규칙 기반 (오류: HTTP Error 400: Bad Request)"
+        },
+        "참여_유도": {
+          "rubric_score": 1.72,
+          "weighted_score": 0.258,
+          "evidence": [
+            "인포메이션 스키마 정보를 보려면 얘와 3번의 제약 조건을 지정하는 수업을 같이 해서 얘를 어제 확인을 했었어요.",
+            "양쪽으로 그리고 지금 버전별로 접속해서 혹시나 뭐 안 되는 거 있는지 바쁘게 지금 움직이고 있는데, 여러분들도 이따가 트랜잭션 할 때는 CMD 제가",
+            "거희 지금 살짝디까지 지금 왔냐면 예전에 뭐 여기 DB 적어드린 여기 보면 셀렉트 함수 서브 쿼리 조인 지금 여러분들 이거"
+          ],
+          "reason": "유도발화 33회 (2.1%), 학생발화 0.3%. 규칙 기반 (오류: HTTP Error 400: Bad Request)"
+        },
+        "질문_응답_충분성": {
+          "rubric_score": 3,
+          "weighted_score": 0.3,
+          "evidence": [
+            "학생 질문 없음"
+          ],
+          "reason": "응답률 100.0%, 미응답 0건, 미흡 0건. 질문 없음 (오류: HTTP Error 400: Bad Request)"
+        }
+      }
+    }
+  }
+}

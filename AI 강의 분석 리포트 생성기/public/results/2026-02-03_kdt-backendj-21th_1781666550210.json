@@ -1,0 +1,172 @@
+{
+  "timestamp": "2026-06-17T03:21:40.804Z",
+  "filename": "2026-02-03_kdt-backendj-21th.txt",
+  "categories": {
+    "cate1": {
+      "category": "1",
+      "category_name": "언어 표현 품질",
+      "score": 2.424,
+      "max_score": 2.75,
+      "criteria": {
+        "불필요한_반복_표현": {
+          "rubric_score": 4.87,
+          "weighted_score": 0.974,
+          "evidence": [
+            "감지된 사례 없음"
+          ],
+          "reason": "페널티 0건 / 1856건. 규칙 기반 (오류: HTTP Error 404: Not Found)",
+          "filler_word_counts": {
+            "이제": 131,
+            "그냥": 92,
+            "뭐": 141,
+            "그러니까": 31,
+            "사실": 4,
+            "어": 7,
+            "그리고": 78
+          }
+        },
+        "발화_완결성": {
+          "rubric_score": 5,
+          "weighted_score": 1,
+          "evidence": [
+            "콘솔 네트워크 이런 사이에제 데이터 이동 자체를 의미를 하는 거고, 자체가 입출력 I이O 자체가 그래서 나 이 아이O가 뭐야? 이러면 프로그램하고",
+            "그 다음에부상 파이콘솔 네트워크 사이 데이터 이동하는 걸 얘기해 이렇게 간단하게 얘기하면 될 것 같고, 여기서 이제 인풋음에 아웃풋 이렇게 이 얘기를 하는데"
+          ],
+          "reason": "미완결 249건. 규칙 기반 (오류: Expecting value: line 5 column 94 (char 181))"
+        },
+        "언어_일관성": {
+          "rubric_score": 3,
+          "weighted_score": 0.45,
+          "evidence": [
+            "[어체혼용] 그래서 텍스트 파일에 좀 적합하다 이렇게 해서 판단하시면 됩니다.",
+            "[어체혼용] 내가 어떤 데이터베이스를 만나도 CRD만 할 수 있으면 돼 안C 코드로 그 어떤 DB도 다 사용할 수 있는 거지 이렇게 저희 수업은 안C 코드를 기본으로 합니다. 저희가"
+          ],
+          "reason": "혼용 6건, 일관성 70점. 규칙 기반 (오류: HTTP Error 404: Not Found)"
+        }
+      }
+    },
+    "cate2": {
+      "category": "2",
+      "category_name": "강의 도입 및 구조",
+      "score": 0,
+      "max_score": 5,
+      "criteria": {
+        "학습목표 안내": {
+          "id": "2.1",
+          "score": 0,
+          "weight": 3,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 404: Not Found"
+        },
+        "전날 복습 연계": {
+          "id": "2.2",
+          "score": 0,
+          "weight": 3,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 404: Not Found"
+        },
+        "설명 순서": {
+          "id": "2.3",
+          "score": 0,
+          "weight": 2,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 404: Not Found"
+        },
+        "핵심내용 강조": {
+          "id": "2.4",
+          "score": 0,
+          "weight": 2,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 404: Not Found"
+        },
+        "마무리 요약": {
+          "id": "2.5",
+          "score": 0,
+          "weight": 1,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 404: Not Found"
+        }
+      }
+    },
+    "cate3": {
+      "category": "3",
+      "category_name": "개념 전달 품질",
+      "score": 10,
+      "max_score": 20,
+      "criteria": {
+        "concept_definition": {
+          "score": 3,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 404: Not Found",
+          "checks": {}
+        },
+        "example_usage": {
+          "score": 3,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 404: Not Found",
+          "checks": {}
+        },
+        "prerequisite_check": {
+          "score": 3,
+          "evidence": "",
+          "reason": "분석 오류: HTTP Error 404: Not Found",
+          "checks": {}
+        },
+        "speech_speed": {
+          "score": 1,
+          "evidence": {
+            "epm": 24714,
+            "cpm": 70010,
+            "label": "극단적으로 빠름"
+          },
+          "reason": "발화 속도 70010음절/분 (극단적으로 빠름). 강의 적정 범위: 250~350음절/분."
+        }
+      }
+    },
+    "cate4": {
+      "category": "4",
+      "category_name": "실습 지도 품질",
+      "score": 0,
+      "max_score": 15,
+      "criteria": {},
+      "overall_summary": "",
+      "recommendations": []
+    },
+    "cate5": {
+      "category": "5",
+      "category_name": "수강생 상호작용",
+      "score": 0.865,
+      "max_score": 2.25,
+      "criteria": {
+        "이해_확인_질문": {
+          "rubric_score": 1.68,
+          "weighted_score": 0.336,
+          "evidence": [
+            "출력 IO 개념 이해하고 프로그램에서 데이터 흐름 설명할 수 있다라고 했었는데 저 입출력 개념 자체가 프로그램이 있어 그러면 이제 외부 자원",
+            "이거제 구성 환경이나 이런 거 이해하고 그다음에 명령어 활용할 수 있는 거 그 다음 두 번째는 셀렉트 문법 이해하고 원하는 컬럼 데이터 조회할 수 있는 거 오늘은 셀렉트 하다가 끝날 것 같아요.",
+            "그다음 세 번째는 조건적 맞는 거 그 다음에 SQL 학습 흐름을 이해하고 구조를 이해할 수 있다인데 이거 우리가 할 거예요."
+          ],
+          "reason": "확인질문 9회 (0.5%), 전반 4회 / 후반 5회. 규칙 기반 (오류: HTTP Error 404: Not Found)"
+        },
+        "참여_유도": {
+          "rubric_score": 1.53,
+          "weighted_score": 0.229,
+          "evidence": [
+            "이거는 스트링할 때부터 말씀을 드렸습니다. 여러분들",
+            "데이터베이스인건 여러분께서 테이블 구조로 가지고 있는 게 정의형 데이터베이스야 그 외에는 다 비정형이야 그래서 비정형을 굳이 뭐 이거 이제 이렇게",
+            "내가 TXST를 여러분들한테 딱 드렸어 TXST 데이터를 읽어가지고 TSV나 XML나 HTM이나 SQL 변경시킬"
+          ],
+          "reason": "유도발화 70회 (3.8%), 학생발화 0.2%. 규칙 기반 (오류: HTTP Error 404: Not Found)"
+        },
+        "질문_응답_충분성": {
+          "rubric_score": 3,
+          "weighted_score": 0.3,
+          "evidence": [
+            "학생 질문 없음"
+          ],
+          "reason": "응답률 100.0%, 미응답 0건, 미흡 0건. 질문 없음 (오류: Expecting property name enclosed in double quotes: line 7 column 31 (char 160))"
+        }
+      }
+    }
+  }
+}
