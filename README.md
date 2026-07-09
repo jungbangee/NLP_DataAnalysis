@@ -1,6 +1,6 @@
-# 📂 NLP Project
+# 📂 NLP & Data Analysis
 
-> **Natural Language Processing (NLP)** 연구/개발 프로젝트 아카이브입니다.
+> **Natural Language Processing (NLP)** 및 **Multimodal Data Analysis** 연구/개발 프로젝트 아카이브입니다.
 > LLM 파인튜닝, AI 에이전트 개발, 멀티모달 딥러닝, 그리고 데이터 시각화 프로젝트를 포함합니다.
 
 <br>
@@ -39,13 +39,7 @@
       * **Issue:** DOCX 내보내기 시 다크 테마 차트가 흰 배경에서 레이블이 보이지 않는 문제.
       * **Solution:** 내보내기 전 오프스크린 Canvas에 별도 Chart 인스턴스를 생성하여 흰 배경 + 검정 레이블로 렌더링 후 캡처.
 
-<br>
-
----
-
-ⓒ 2025. NLP & Data Analysis Portfolio. All rights reserved.
-
-### ### 2\. ListenCarePlease
+### 2\. ListenCarePlease
 
   * **Project Link:** [ListenCarePlease Repository](https://github.com/jungbangee/ListenCarePlease)
   * **주요 목표:** 회의, 인터뷰 등 음성 파일을 분석하여 **화자 분리(Diarization)**, **화자 태깅(Tagging)**, **회의록 요약(Summary)** 을 자동화하는 AI 서비스 개발.
@@ -102,3 +96,9 @@
   * **Troubleshooting:**
       * **Issue:** 대규모 데이터 내 취소/환불 건이 매출 합산 시 중복 집계되거나 지표를 왜곡하는 문제.
       * **Solution:** 취소 건에 대한 `고유 거래 ID 식별 로직`을 구축하여 순매출과 취소율을 분리 정의함으로써 분석 데이터의 신뢰도 확보.
+
+<br>
+
+---
+
+ⓒ 2025. NLP & Data Analysis Portfolio. All rights reserved.
