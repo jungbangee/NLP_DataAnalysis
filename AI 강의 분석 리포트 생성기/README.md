@@ -1,92 +1,199 @@
------
+# AI 강의분석 리포트 시스템
 
-# 📂 NLP & Data Analysis
+STT(Speech-to-Text) 기반 강의 텍스트를 AI로 분석하여 강사별 역량을 평가하고 시각화하는 웹 대시보드입니다.
 
-> **Natural Language Processing (NLP)** 및 **Multimodal Data Analysis** 연구/개발 프로젝트 아카이브입니다.
-> LLM 파인튜닝, AI 에이전트 개발, 멀티모달 딥러닝, 그리고 데이터 시각화 프로젝트를 포함합니다.
+## 주요 기능
 
-<br>
+- `.txt` 강의 파일 업로드 및 5개 카테고리 자동 분석
+- 레이더 차트 · 막대 차트 · 점수 카드로 결과 시각화
+- 강사별 종합 평가 (역량 프로파일, 강점/약점, 개발 과제) AI 자동 생성
+- 강사 간 비교 대시보드 (카테고리 비교, 날짜별 추이, 성장률)
+- 분석 결과 PDF · DOCX 내보내기
+- MongoDB 기반 분석 이력 저장 및 관리 
 
-## 📜 Project List
+---
 
-| Project Name | Description | Key Tech Stack |
-| :--- | :--- | :--- |
-| **[1] ListenCarePlease** | **AI 기반 회의록 자동 생성 및 화자 태깅 서비스**<br>• Whisper(STT)와 LangGraph Agent를 활용한 화자 분리 및 태깅<br>• 회의 유형별(6종) 맞춤형 회의록 생성 및 TODO 자동 추출<br>• RAG 기반 질의응답 및 발화 효율성 분석 대시보드 제공 |   <br> `Whisper` `LangGraph` `React` |
-| **[2] QA봇** | **Llama-3.2 기반 RLHF 파이프라인 구축**<br>• `SFT` → `RM` → `PPO` → `Merge` 전 과정 구현<br>• Human Feedback을 반영한 QA 모델 정렬(Alignment)<br>• LoRA 및 4-bit Quantization을 통한 효율적 학습 |   <br> `Transformers` `TRL` `PEFT` |
-| **[3] 발화자 감정 판별** | **KoBERT & FT-Transformer 기반 멀티모달 심리 분석**<br>• 대화 텍스트(Text)와 인구통계 정보(Tabular) 결합<br>• **Cross-Attention**을 활용한 Late Fusion 아키텍처 구현<br>• 발화자의 불안/우울 지수 예측 멀티태스크 학습 |   <br> `FT-Transformer` `Multimodal` |
-| **[4] 예술의 전당 예매 데이터 분석** | **예술의 전당 예매 데이터 기반 매출 증대 전략 분석**<br>• 2015\~2023년 티켓 판매 빅데이터 전처리 및 EDA<br>• 고객 세분화(Member, Age) 및 시기별 매출 패턴 분석<br>• **Tableau** 대시보드를 활용한 마케팅 인사이트 도출 |   <br> `Data Visualization` |
+## 프로젝트 구조
 
-<br>
+```
+NLP_Task_AI_Report/
+│
+├── server.js                  # Express 메인 서버 (API + 인증 + DB 연동)
+├── package.json
+│
+├── public/                    # 프론트엔드 HTML (정적 서빙)
+│   ├── login.html             # 로그인 페이지
+│   ├── dashboard.html         # 메인 대시보드 (강의 분석 업로드)
+│   ├── instructors.html       # 강사 목록 대시보드
+│   ├── instructor.html        # 강사 개인 종합평가 페이지
+│   ├── analysis.html          # 강의별 상세 분석 결과 페이지
+│   └── comparison.html        # 강사 간 비교 분석 페이지
+│
+├── cate1,5/                   # 카테고리 1·5 분석 스크립트
+│   └── lecture_analyzer.py    # 언어 표현 품질 / 수강생 상호작용 분석
+│
+├── cate2/                     # 카테고리 2 분석 스크립트
+│   └── v8_unified.py          # 강의 도입 및 구조 분석
+│
+├── cate3/                     # 카테고리 3 분석 스크립트
+│   └── main.py                # 개념 설명 명확성 분석
+│
+├── cate4/                     # 카테고리 4 분석 스크립트
+│   └── cate4_analyze_lecture.py  # 예시 및 실습 연계 분석
+│
+├── instructor_summary.py      # 강사 종합평가 AI 생성 스크립트
+├── daily_summary.py           # 일별 강의 요약 생성 스크립트
+├── generate_docx.py           # DOCX 내보내기 스크립트
+│
+├── json/                      # 기분석 JSON 결과물 (DB import용)
+│   ├── cate15/                # cate1 + cate5 분석 결과
+│   ├── cate2/                 # cate2 분석 결과
+│   ├── cate3/                 # cate3 분석 결과
+│   ├── cate4/                 # cate4 분석 결과
+│   ├── 데일리평가/             # 일별 요약 결과
+│   └── 강사평가 결과_날짜별추이/ # 강사별 종합평가 결과
+│
+├── results/                   # 분석 중간 결과물 (로컬 캐시)
+├── results_unified/           # 통합 분석 결과 (summary + instructor)
+├── uploads/                   # 업로드된 CSV 메타데이터 파일
+├── backup/                    # DB 백업 디렉토리
+│
+├── import_to_db.py            # json/ 폴더 결과물을 MongoDB에 일괄 import
+├── backup_db.py               # MongoDB 컬렉션을 JSON으로 백업
+└── .env                       # 환경변수 설정
+```
 
-## 🛠️ Detail Overview
+---
 
-### 1\. ListenCarePlease
+## 평가 카테고리
 
-  * **Project Link:** [ListenCarePlease Repository](https://github.com/jungbangee/ListenCarePlease)
-  * **주요 목표:** 회의, 인터뷰 등 음성 파일을 분석하여 **화자 분리(Diarization)**, **화자 태깅(Tagging)**, **회의록 요약(Summary))** 을 자동화하는 AI 서비스 개발.
-  * **핵심 기능:**
-      * **Advanced Speaker Tagging:** LangGraph Agent를 활용한 5단계 파이프라인(음성/텍스트 임베딩 매칭 + LLM 추론)으로 정확한 화자 식별.
-      * **Smart Meeting Minutes:** 6가지 회의 유형(정보 전달, 문제 해결 등)을 자동 감지하여 구조화된 회의록 및 키워드 생성.
-      * **AI Assistant Tools:** RAG(Retrieval-Augmented Generation) 기반 회의 내용 질의응답 및 실행 가능한 TODO/일정 자동 추출.
-      * **Efficiency Dashboard:** 발화 빈도, 침묵 시간, 화자 간 상호작용 네트워크(Interaction Network) 등 회의 효율성 지표 시각화.
-  
-  * **Technical Decision:**
-      * **LangGraph:** 단순 선형 파이프라인이 아닌, 화자 정보 불확실 시 재추론을 수행하거나 회의 유형에 따라 로직을 분기하는 **Cyclic Graph**를 구현하기 위해 채택.
+| 카테고리 | 항목 | 설명 |
+|----------|------|------|
+| Cate 1 | 1.1 ~ 1.3 | 언어 표현 품질 (발음, 문장 완성도, 언어 품질) |
+| Cate 2 | 2.1 ~ 2.5 | 강의 도입 및 구조 (학습목표, 전날복습, 개념정의 등) |
+| Cate 3 | 3.1 ~ 3.4 | 개념 설명 명확성 (설명순서, 핵심강조, 비유활용 등) |
+| Cate 4 | 4.1 ~ 4.3 | 예시 및 실습 연계 (예시적절성, 실습연계, 오류대응) |
+| Cate 5 | 5.1 ~ 5.3 | 수강생 상호작용 (질문유도, 반응확인, 참여독려) |
 
-  * **Troubleshooting:**
-      * **Issue:** Whisper 모델의 긴 침묵 구간에서 발생하는 환각(Hallucination) 및 중복 텍스트 생성 문제.
-      * **Solution:** `VAD(Voice Activity Detection)`를 전처리 단계에 도입하여 유효 발화 구간을 선별함으로써 데이터 노이즈 제거 및 요약 성능 개선.
+각 항목은 1~5점으로 평가되며, 100점 만점으로 환산됩니다.
 
-### 2\. QA봇
+---
 
-  * **주요 목표:** Pre-trained LLM(Llama-3.2-1B)이 사용자의 의도에 부합하는 자연스러운 답변을 생성하도록 강화학습(RLHF) 적용.
-  * **데이터:** [RLHF 학습 데이터](https://www.aihub.or.kr/aihubdata/data/view.do?currMenu=115&topMenu=100&aihubDataSe=data&dataSetSn=71748)
-  * **핵심 기능:**
-      * **SFT (Supervised Fine-Tuning):** 질의응답 데이터셋을 통한 기본 답변 능력 학습.
-      * **Reward Model:** 인간의 선호도를 모방하여 답변 품질을 평가하는 보상 모델 학습.
-      * **PPO (Proximal Policy Optimization):** 보상 점수를 최대화하는 방향으로 생성 모델 정책 최적화.
-  
-  * **Technical Decision:**
-      * **LoRA & PEFT:** 8B급 이상의 모델 전체 튜닝은 리소스 소모가 크므로, 일부 파라미터만 학습하는 **LoRA**를 활용해 학습 효율과 성능의 균형을 맞춤.
-  * **Troubleshooting:**
-      * **Issue:** PPO 학습 중 보상 모델의 허점을 이용해 특정 패턴의 문구만 반복하여 보상 점수를 높게 받는 **Reward Hacking** 발생.
-      * **Solution:** `KL-Divergence Penalty` 계수를 튜닝하여 초기 모델의 정책에서 너무 멀어지지 않도록 제어함으로써 답변의 일관성 유지.
+## MongoDB 컬렉션 구조
 
-### 3\. 발화자 감정 판별
+| 컬렉션 | 설명 |
+|--------|------|
+| `categoryresults` | 강의별 카테고리 분석 결과 (cate1~5) |
+| `dailysummaries` | 강의별 일일 종합 요약 |
+| `instructorsummaries` | 강사별 종합평가 (AI 생성) |
+| `analyses` | 분석 실행 이력 |
+| `metas` | 강의 메타데이터 (CSV 업로드) |
 
-  * **주요 목표:** 단순 텍스트 분석의 한계를 넘어, 고령자의 인구통계학적 정보(나이, 가구 형태 등)와 구술 텍스트를 함께 분석하여 정밀한 심리 상태(불안/우울)를 진단하는 AI 모델 연구.
-  * **데이터:** [고령자 근현대 경험 기반 스토리 구술 데이터](https://www.aihub.or.kr/aihubdata/data/view.do?pageIndex=2&currMenu=115&topMenu=100&srchOptnCnd=OPTNCND001&searchKeyword=&srchDetailCnd=DETAILCND001&srchOrder=ORDER001&srchPagePer=20&srchDataRealmCode=REALM002&aihubDataSe=data&dataSetSn=71703) (AI Hub)
-  * **핵심 기능:**
-      * **Multimodal Fusion:** 텍스트 임베딩(KoBERT)과 정형 데이터 임베딩(FT-Transformer)을 Attention 메커니즘으로 융합.
-      * **Cross-Attention:** 서로 다른 모달리티(Text ↔ Tabular) 간의 상호작용을 학습하여 정보 손실을 최소화한 Late Fusion 아키텍처.
-      * **Multi-task Learning:** 4가지 심리 척도(Anxiety 1/2, Depression 1/2)를 동시에 예측하여 일반화 성능 향상.
-   
-  * **Technical Decision:**
-      * **Cross-Attention:** 텍스트와 정형 데이터를 단순 결합(Concat)하지 않고, 두 모달리티 간의 상관관계를 동적으로 반영할 수 있는 메커니즘 채택.
+---
 
-  * **Troubleshooting:**
-      * **Issue:** 사전 학습된 KoBERT와 처음부터 학습하는 FT-Transformer 간의 학습 속도 차이로 인한 모델 불균형.
-      * **Solution:** `Differential Learning Rate`를 적용하여 각 인코더별 최적의 학습률을 다르게 설정함으로써 멀티모달 융합 성능 극대화.
+## 설치 및 실행
 
+### 사전 요구사항
 
-### 4\. 예술의 전당 예매 데이터 분석
+- Node.js 18+
+- Python 3.10+
+- MongoDB 6.0+
 
-  * **주요 목표:** 예술의 전당 예매 데이터를 분석하여 적자 개선 및 흑자 전환을 위한 효율적인 마케팅/프로모션 전략 수립.
-  * **데이터:** [문화 빅데이터 플랫폼의 2015\~2023년 티켓 판매 데이터 및 공연장 좌석 정보](https://www.bigdata-culture.kr/bigdata/user/data_market/detail.do?id=1bc78801-5d36-4295-b49e-fe2a47e062e)
-  * **핵심 과정:**
-      * **Data Preprocessing:** 결측치 처리, 파생변수 생성(ID, 날짜 병합), 범주형 데이터 변환(나이대, 환불여부 등)을 통한 분석용 데이터셋 구축.
-      * **EDA & Strategy:** 유료 회원 등급, 공연 요일/시간, 장르별 선호도, 연령대가 매출에 미치는 영향 분석.
-      * **Dashboarding:** 경영진 및 마케팅 팀을 위한 Tableau 대시보드 설계 (시간 흐름, 성별/연령별 분포 시각화).
-  * **결과:** 맞춤형 공연 기획 및 타겟 마케팅을 통한 매출 극대화 방안 제시.
+### 환경변수 설정 (`.env`)
 
-* **Technical Decision:**
-    * **Tableau:** 대규모 시계열 데이터(8개년)를 다각도에서 실시간으로 필터링하며 인사이트를 도출하기 위해 시각화 도구로 선정.
+```env
+MONGO_URI=mongodb://127.0.0.1:27017/nlp_lecture
+SESSION_SECRET=your_secret_key
+ADMIN_ID=admin
+ADMIN_PW=your_password
+GOOGLE_API_KEY=your_gemini_api_key
+PORT=3000
+```
 
-* **Troubleshooting:**
-    * **Issue:** 대규모 데이터 내 취소/환불 건이 매출 합산 시 중복 집계되거나 지표를 왜곡하는 문제.
-    * **Solution:** 취소 건에 대한 `고유 거래 ID 식별 로직`을 구축하여 순매출과 취소율을 분리 정의함으로써 분석 데이터의 신뢰도 확보.
-<br>
+### 의존성 패키지
 
------
+**Node.js 패키지** (`npm install` 로 일괄 설치)
 
-ⓒ 2025. NLP & Data Analysis Portfolio. All rights reserved.
+| 패키지 | 용도 |
+|--------|------|
+| `express` | 웹 서버 프레임워크 |
+| `express-session` | 로그인 세션 관리 |
+| `mongoose` | MongoDB ODM |
+| `multer` | 파일 업로드 처리 |
+| `dotenv` | 환경변수 로드 |
+
+**Python 패키지**
+
+| 패키지 | 용도 | 설치 명령 |
+|--------|------|-----------|
+| `google-genai` | Gemini AI API 호출 | `pip install google-genai` |
+| `pymongo` | MongoDB 연결 | `pip install pymongo` |
+| `python-dotenv` | 환경변수 로드 | `pip install python-dotenv` |
+| `python-docx` | DOCX 파일 생성 | `pip install python-docx` |
+| `Pillow` | 차트 이미지 처리 | `pip install Pillow` |
+| `pandas` | 데이터 처리 | `pip install pandas` |
+| `pydantic` | 데이터 유효성 검사 | `pip install pydantic` |
+
+### 설치
+
+```bash
+# Node.js 패키지
+npm install
+
+# Python 패키지 (한 번에 설치)
+pip install google-genai pymongo python-dotenv python-docx Pillow pandas pydantic
+```
+
+### 실행
+
+```bash
+node server.js
+```
+
+브라우저: `http://localhost:3000`
+
+---
+
+## DB 관련 유틸리티
+
+### 백업
+
+```bash
+python backup_db.py
+# → backup/YYYYMMDD_HHMM/ 폴더에 컬렉션별 JSON 저장
+```
+
+### 기분석 결과 일괄 Import
+
+`json/` 폴더에 분석 결과 JSON 파일들을 배치한 후 실행:
+
+```bash
+python import_to_db.py
+```
+
+---
+
+## 분석 흐름
+
+```
+.txt 강의 파일 업로드
+        ↓
+server.js → cate1~5 Python 스크립트 병렬 실행
+        ↓
+각 카테고리 점수 + 피드백 생성
+        ↓
+MongoDB (categoryresults) 저장
+        ↓
+daily_summary.py → 일별 종합 요약 생성
+        ↓
+instructor_summary.py → 강사 종합평가 생성 (수동 실행)
+        ↓
+웹 대시보드에서 시각화 / PDF · DOCX 내보내기
+```
+
+---
+
+## 주의사항
+
+- `.env` 파일은 Git에 포함되지 않습니다. 직접 생성해야 합니다.
+- `uploads/`, `backup/`, `results/`, `results_unified/`, `node_modules/`, `json/` 폴더는 `.gitignore`에 추가를 권장합니다.
