@@ -573,6 +573,34 @@ app.get('/api/benchmark', requireAuth, async (req, res) => {
   }
 });
 
+// ── 라우트: API 비용 집계 ────────────────────────────────────
+app.get('/api/cost-summary', requireAuth, async (req, res) => {
+  try {
+    const dailyDocs = await DailySummary.find({}, { cost_usd: 1, tokens: 1, date: 1, course_id: 1, model: 1 }).lean();
+    const instrDocs = await InstructorSummary.find({}, { cost_usd: 1, tokens: 1, instructor: 1, model: 1 }).lean();
+
+    const sum = (arr) => arr.reduce((s, d) => s + (d.cost_usd || 0), 0);
+    const dailyCost = sum(dailyDocs);
+    const instrCost = sum(instrDocs);
+
+    res.json({
+      daily_summary: {
+        count: dailyDocs.length,
+        total_cost_usd: Number(dailyCost.toFixed(5)),
+        avg_cost_usd:   dailyDocs.length ? Number((dailyCost/dailyDocs.length).toFixed(5)) : 0,
+      },
+      instructor_summary: {
+        count: instrDocs.length,
+        total_cost_usd: Number(instrCost.toFixed(5)),
+        avg_cost_usd:   instrDocs.length ? Number((instrCost/instrDocs.length).toFixed(5)) : 0,
+      },
+      grand_total_usd: Number((dailyCost + instrCost).toFixed(5)),
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── 라우트: 강사 등급 목록 ───────────────────────────────────
 app.get('/api/instructor-grades', requireAuth, async (req, res) => {
   try {
